@@ -1,0 +1,3361 @@
+<title>nuGW 업무관리 플랫폼 — 화면 목업</title>
+<style>
+  /* ---------- Tokens ---------- */
+  :root{
+    --bg:#F4F5F8;
+    --surface:#FFFFFF;
+    --surface-alt:#ECEEF3;
+    --border:#DFE2EA;
+    --border-strong:#C9CDD9;
+    --text:#1B2036;
+    --text-muted:#5B6178;
+    --text-faint:#8A8FA3;
+    --accent:#33427A;
+    --accent-strong:#263066;
+    --accent-soft:#E8EAF6;
+    --on-accent:#FFFFFF;
+    --success:#1E8A5F;
+    --success-soft:#E3F3EA;
+    --warning:#A9700A;
+    --warning-soft:#FBF0DC;
+    --danger:#C4433B;
+    --danger-soft:#FBE6E4;
+    --shadow-sm:0 1px 2px rgba(20,22,31,.07),0 1px 0 rgba(20,22,31,.03);
+    --shadow-md:0 8px 24px rgba(20,22,31,.14),0 2px 6px rgba(20,22,31,.08);
+    --r-sm:6px;
+    --r-md:10px;
+    --r-lg:16px;
+    --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+    --font-mono:ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161F;
+      --surface:#1C1F2C;
+      --surface-alt:#232637;
+      --border:#2B2F41;
+      --border-strong:#3A3F57;
+      --text:#E7E8EE;
+      --text-muted:#9498AC;
+      --text-faint:#6A6E82;
+      --accent:#8C9AE8;
+      --accent-strong:#AAB4EE;
+      --accent-soft:#262C4A;
+      --on-accent:#141726;
+      --success:#4FBE8B;
+      --success-soft:#183226;
+      --warning:#E0A63B;
+      --warning-soft:#332A14;
+      --danger:#E38078;
+      --danger-soft:#3A1E1C;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.5);
+      --shadow-md:0 8px 24px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161F;
+    --surface:#1C1F2C;
+    --surface-alt:#232637;
+    --border:#2B2F41;
+    --border-strong:#3A3F57;
+    --text:#E7E8EE;
+    --text-muted:#9498AC;
+    --text-faint:#6A6E82;
+    --accent:#8C9AE8;
+    --accent-strong:#AAB4EE;
+    --accent-soft:#262C4A;
+    --on-accent:#141726;
+    --success:#4FBE8B;
+    --success-soft:#183226;
+    --warning:#E0A63B;
+    --warning-soft:#332A14;
+    --danger:#E38078;
+    --danger-soft:#3A1E1C;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.5);
+    --shadow-md:0 8px 24px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-sans);
+    font-size:14px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{text-wrap:balance;margin:0;font-weight:700;letter-spacing:-.01em;}
+  p{margin:0;}
+  button{font-family:inherit;font-size:inherit;}
+  input,select,textarea{font-family:inherit;font-size:inherit;color:var(--text);}
+  ::selection{background:var(--accent-soft);}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+  }
+  .num{font-variant-numeric:tabular-nums;font-family:var(--font-mono);}
+
+  /* ---------- App shell ---------- */
+  #app{min-height:100vh;}
+  .shell{display:grid;grid-template-columns:232px 1fr;min-height:100vh;}
+  .sidebar{
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    display:flex;flex-direction:column;
+    padding:20px 14px;
+    gap:4px;
+  }
+  .nav-backdrop{display:none;}
+  .hamburger{
+    display:none;align-items:center;justify-content:center;
+    width:34px;height:34px;border-radius:var(--r-sm);border:1px solid var(--border-strong);
+    background:var(--surface);color:var(--text-muted);cursor:pointer;flex:none;
+  }
+  .hamburger:hover{background:var(--surface-alt);}
+  .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 20px;}
+  .brand-mark{
+    width:30px;height:30px;border:1.6px solid var(--accent);border-radius:7px;
+    display:flex;align-items:center;justify-content:center;
+    transform:rotate(-6deg);color:var(--accent);
+    font-family:var(--font-mono);font-weight:700;font-size:12px;flex:none;
+  }
+  .brand-text{display:flex;flex-direction:column;line-height:1.15;}
+  .brand-text b{font-size:15px;letter-spacing:-.01em;font-family:var(--font-mono);}
+  .brand-text span{font-size:11px;color:var(--text-faint);}
+
+  .nav-group{margin:10px 0 2px;padding:0 8px;font-size:11px;color:var(--text-faint);letter-spacing:.04em;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 10px;border-radius:var(--r-sm);
+    color:var(--text-muted);cursor:pointer;border:1px solid transparent;
+    background:none;text-align:left;width:100%;
+  }
+  .nav-item svg{flex:none;color:var(--text-faint);}
+  .nav-item:hover{background:var(--surface-alt);color:var(--text);}
+  .nav-item.active{background:var(--accent-soft);color:var(--accent-strong);font-weight:600;}
+  .nav-item.active svg{color:var(--accent-strong);}
+  .nav-item .badge-count{
+    margin-left:auto;background:var(--danger);color:#fff;font-size:11px;font-weight:700;
+    min-width:18px;height:18px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 5px;
+  }
+
+  .sidebar-foot{margin-top:auto;border-top:1px solid var(--border);padding-top:12px;}
+  .user-menu{display:flex;flex-direction:column;gap:2px;margin-bottom:6px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+  .user-chip{display:flex;align-items:center;gap:10px;padding:6px 8px;}
+  button.user-chip:hover{background:var(--surface-alt);}
+  .avatar{
+    width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent-strong);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none;
+  }
+  .user-meta{display:flex;flex-direction:column;line-height:1.2;overflow:hidden;}
+  .user-meta b{font-size:13px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
+  .user-meta span{font-size:11.5px;color:var(--text-faint);white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
+  .logout-btn{
+    margin-top:8px;width:100%;display:flex;align-items:center;gap:10px;
+    padding:9px 10px;border-radius:var(--r-sm);border:1px solid transparent;background:none;
+    color:var(--text-faint);cursor:pointer;
+  }
+  .logout-btn:hover{background:var(--danger-soft);color:var(--danger);}
+
+  .main{display:flex;flex-direction:column;min-width:0;}
+  .topbar{
+    height:60px;flex:none;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;background:var(--surface);
+  }
+  .topbar h1{font-size:17px;}
+  .topbar .sub{font-size:12.5px;color:var(--text-faint);margin-top:2px;}
+  .topbar-right{display:flex;align-items:center;gap:16px;color:var(--text-muted);font-size:13px;}
+  .content{padding:28px;flex:1;min-width:0;}
+
+  /* ---------- Notifications ---------- */
+  .notif-wrap{position:relative;}
+  .notif-btn{
+    position:relative;background:none;border:none;color:var(--text-muted);cursor:pointer;
+    padding:6px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  }
+  .notif-btn:hover{background:var(--surface-alt);color:var(--text);}
+  .notif-badge{
+    position:absolute;top:2px;right:2px;background:var(--danger);color:#fff;font-size:10px;font-weight:700;
+    min-width:15px;height:15px;border-radius:999px;display:flex;align-items:center;justify-content:center;
+    padding:0 3px;border:1.5px solid var(--surface);
+  }
+  .notif-backdrop{position:fixed;inset:0;z-index:159;background:transparent;}
+  .notif-dropdown{
+    position:absolute;top:calc(100% + 10px);right:0;width:360px;max-width:88vw;max-height:440px;
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);
+    box-shadow:var(--shadow-md);z-index:160;display:flex;flex-direction:column;overflow:hidden;
+    animation:panel-in .16s ease-out;
+  }
+  .notif-dropdown-head{
+    display:flex;align-items:center;justify-content:space-between;padding:14px 16px;
+    border-bottom:1px solid var(--border);flex:none;
+  }
+  .notif-dropdown-head b{font-size:14px;}
+  .notif-mark-all{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:2px;}
+  .notif-mark-all:hover{text-decoration:underline;}
+  .notif-list{overflow-y:auto;flex:1;}
+  .notif-item{
+    display:flex;gap:10px;align-items:flex-start;padding:12px 16px;cursor:pointer;
+    border-bottom:1px solid var(--border);text-align:left;width:100%;background:none;border-left:none;border-right:none;border-top:none;
+  }
+  .notif-item:last-child{border-bottom:none;}
+  .notif-item:hover{background:var(--surface-alt);}
+  .notif-item.unread{background:var(--accent-soft);}
+  .notif-item.unread:hover{background:var(--accent-soft);filter:brightness(0.97);}
+  .notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:5px;flex:none;}
+  .notif-dot.hidden{visibility:hidden;}
+  .notif-body{flex:1;min-width:0;}
+  .notif-body .notif-title{font-size:13px;font-weight:600;color:var(--text);}
+  .notif-body .notif-msg{font-size:12.5px;color:var(--text-muted);margin-top:2px;line-height:1.4;}
+  .notif-body .notif-time{font-size:11px;color:var(--text-faint);margin-top:4px;}
+  .notif-empty{padding:36px 16px;text-align:center;color:var(--text-faint);font-size:13px;}
+  .content-narrow{max-width:760px;}
+
+  /* ---------- Generic components ---------- */
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+    box-shadow:var(--shadow-sm);
+  }
+  .card-pad{padding:20px 22px;}
+  .card-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;gap:12px;}
+  .card-head h2{font-size:15px;}
+  .card-head .hint{font-size:12.5px;color:var(--text-faint);}
+  .stack{display:flex;flex-direction:column;gap:18px;}
+  .row{display:flex;gap:18px;}
+  .grid-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .grid-2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start;}
+
+  .stat{padding:18px 20px;}
+  .stat .label{font-size:12.5px;color:var(--text-faint);letter-spacing:.02em;}
+  .stat .value{font-size:28px;font-weight:700;margin-top:6px;font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+  .stat .value small{font-size:14px;color:var(--text-faint);font-weight:500;margin-left:2px;}
+  .stat .delta{font-size:12px;margin-top:6px;color:var(--text-muted);}
+
+  .pill{
+    display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;
+    font-size:12px;font-weight:600;white-space:nowrap;
+  }
+  .pill.success{background:var(--success-soft);color:var(--success);}
+  .pill.warning{background:var(--warning-soft);color:var(--warning);}
+  .pill.danger{background:var(--danger-soft);color:var(--danger);}
+  .pill.neutral{background:var(--surface-alt);color:var(--text-muted);}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+  table{width:100%;border-collapse:collapse;}
+  th{
+    text-align:left;font-size:11.5px;color:var(--text-faint);font-weight:600;
+    letter-spacing:.03em;padding:0 12px 8px;border-bottom:1px solid var(--border);
+  }
+  td{padding:12px 12px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .table-wrap{overflow-x:auto;}
+  .list-row{
+    display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--border);
+  }
+  .list-row:last-child{border-bottom:none;}
+
+  label{display:block;font-size:12.5px;font-weight:600;color:var(--text-muted);margin-bottom:6px;}
+  .field{display:flex;flex-direction:column;}
+  .input,select.input,textarea.input{
+    width:100%;border:1px solid var(--border-strong);background:var(--surface);
+    border-radius:var(--r-sm);padding:9px 11px;color:var(--text);
+  }
+  textarea.input{resize:vertical;line-height:1.6;font-family:var(--font-sans);}
+  .input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent;}
+  .field-row{display:flex;gap:12px;}
+  .field-row > *{flex:1;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .helptext{font-size:12px;color:var(--text-faint);margin-top:5px;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    border-radius:var(--r-sm);padding:9px 16px;font-weight:600;font-size:13.5px;
+    border:1px solid var(--border-strong);background:var(--surface);color:var(--text);cursor:pointer;
+  }
+  .btn:hover{background:var(--surface-alt);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);}
+  .btn.primary:hover{background:var(--accent-strong);border-color:var(--accent-strong);}
+  .btn.ghost{border-color:transparent;background:none;}
+  .btn.ghost:hover{background:var(--surface-alt);}
+  .btn.danger-o{border-color:var(--danger);color:var(--danger);background:none;}
+  .btn.danger-o:hover{background:var(--danger-soft);}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;justify-content:flex-end;}
+
+  .badge-auto{
+    display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;
+    color:var(--accent-strong);background:var(--accent-soft);padding:3px 9px;border-radius:999px;
+  }
+
+  .divider{height:1px;background:var(--border);border:none;margin:0;}
+  .empty{padding:30px 10px;text-align:center;color:var(--text-faint);font-size:13px;}
+
+  /* ---------- Login ---------- */
+  .login-wrap{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(600px 300px at 15% 8%, var(--accent-soft), transparent 60%),
+      var(--bg);
+    padding:24px;
+  }
+  .login-card{width:100%;max-width:380px;padding:32px 30px;}
+  .login-brand{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin-bottom:26px;}
+  .login-brand .brand-mark{width:42px;height:42px;font-size:15px;border-radius:9px;}
+  .login-brand h1{font-size:19px;}
+  .login-brand p{font-size:13px;color:var(--text-faint);margin-top:4px;}
+  .login-demo{
+    margin-top:18px;font-size:12px;color:var(--text-faint);
+    background:var(--surface-alt);border-radius:var(--r-sm);padding:10px 12px;
+  }
+  .login-demo b{color:var(--text-muted);}
+
+  /* ---------- Toast ---------- */
+  #toast-region{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:8px;z-index:200;}
+  .toast{
+    background:var(--text);color:var(--bg);padding:11px 16px;border-radius:var(--r-sm);
+    font-size:13px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:8px;
+    animation:toast-in .18s ease-out;
+  }
+  @keyframes toast-in{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ---------- Approval detail panel ---------- */
+  .overlay{
+    position:fixed;inset:0;background:rgba(10,11,18,.42);display:flex;justify-content:flex-end;z-index:150;
+  }
+  .panel{
+    width:420px;max-width:92vw;background:var(--surface);height:100%;
+    box-shadow:var(--shadow-md);padding:24px;overflow-y:auto;
+    animation:panel-in .18s ease-out;
+    display:flex;flex-direction:column;gap:18px;
+  }
+  @keyframes panel-in{from{transform:translateX(16px);opacity:.5;}to{transform:translateX(0);opacity:1;}}
+  .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .icon-btn{
+    background:none;border:none;color:var(--text-faint);cursor:pointer;padding:4px;border-radius:6px;
+  }
+  .icon-btn:hover{background:var(--surface-alt);color:var(--text);}
+  .kv{display:flex;flex-direction:column;gap:10px;}
+  .kv-row{display:flex;justify-content:space-between;gap:14px;font-size:13px;}
+  .kv-row .k{color:var(--text-faint);}
+  .kv-row .v{font-weight:600;text-align:right;}
+  .body-box{
+    background:var(--surface-alt);border-radius:var(--r-sm);padding:14px;font-size:13px;
+    white-space:pre-wrap;line-height:1.6;color:var(--text-muted);
+  }
+
+  .stamp{
+    display:inline-flex;align-items:center;gap:6px;border:2px solid var(--success);color:var(--success);
+    font-weight:700;font-size:12px;letter-spacing:.04em;padding:5px 12px;border-radius:8px;
+    transform:rotate(-4deg);animation:stamp-in .22s cubic-bezier(.2,1.4,.4,1);
+  }
+  .stamp.reject{border-color:var(--danger);color:var(--danger);}
+  @keyframes stamp-in{from{transform:rotate(-4deg) scale(1.6);opacity:0;}to{transform:rotate(-4deg) scale(1);opacity:1;}}
+
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+  .tab{
+    padding:9px 4px;margin-right:18px;font-size:13.5px;color:var(--text-faint);
+    border-bottom:2px solid transparent;cursor:pointer;font-weight:600;background:none;border-top:none;border-left:none;border-right:none;
+  }
+  .tab.active{color:var(--accent-strong);border-bottom-color:var(--accent);}
+
+  /* ---------- Calendar ---------- */
+  .cal-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+  .cal-legend{display:flex;gap:16px;align-items:center;font-size:12px;color:var(--text-muted);}
+  .cal-legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+  .cal-weekhead{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-sm) var(--r-sm) 0 0;overflow:hidden;}
+  .cal-weekhead div{background:var(--surface-alt);padding:8px 0;text-align:center;font-size:11.5px;font-weight:700;color:var(--text-faint);}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-sm) var(--r-sm);overflow:hidden;}
+  .cal-cell{background:var(--surface);min-height:98px;padding:6px;display:flex;flex-direction:column;gap:3px;}
+  .cal-cell.out{background:var(--surface-alt);}
+  .cal-cell.today{box-shadow:inset 0 0 0 2px var(--accent);}
+  .cal-daynum{font-size:12px;font-weight:700;color:var(--text-muted);}
+  .cal-cell.out .cal-daynum{color:var(--text-faint);}
+  .cal-cell.today .cal-daynum{color:var(--accent-strong);}
+  .cal-chip{
+    display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;
+    font-size:11px;padding:2px 6px;border-radius:5px;line-height:1.4;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .cal-chip.leave{background:var(--success-soft);color:var(--success);}
+  .cal-chip.event{background:var(--accent-soft);color:var(--accent-strong);}
+  .cal-more{font-size:11px;color:var(--text-faint);background:none;border:none;cursor:pointer;text-align:left;padding:2px 6px;}
+  .cal-more:hover{text-decoration:underline;}
+
+  /* ---------- Modal (centered overlay) ---------- */
+  .overlay.center{justify-content:center;align-items:center;}
+  .modal{
+    width:480px;max-width:92vw;max-height:88vh;overflow-y:auto;background:var(--surface);
+    border-radius:var(--r-lg);box-shadow:var(--shadow-md);padding:24px;
+    display:flex;flex-direction:column;gap:16px;
+    animation:panel-in .18s ease-out;
+  }
+
+  .upload-box{
+    border:1.5px dashed var(--border-strong);border-radius:var(--r-sm);padding:14px 16px;
+    display:flex;align-items:center;gap:10px;color:var(--text-faint);font-size:13px;
+    background:var(--surface-alt);
+  }
+  .upload-box.filled{border-style:solid;border-color:var(--accent);color:var(--text);background:var(--accent-soft);}
+  .checkbox-row{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--text);}
+  .checkbox-row input{width:16px;height:16px;accent-color:var(--accent);}
+  optgroup{font-weight:700;color:var(--text-muted);}
+
+  /* ---------- Date field (텍스트 자동변환 + 달력 선택) ---------- */
+  .date-group{position:relative;display:flex;align-items:center;}
+  .date-group input.input{flex:1;padding-right:34px;font-variant-numeric:tabular-nums;}
+  .date-icon-btn{
+    position:absolute;right:4px;background:none;border:none;color:var(--text-faint);
+    cursor:pointer;padding:5px;border-radius:5px;display:flex;
+  }
+  .date-icon-btn:hover{background:var(--surface-alt);color:var(--text);}
+  .date-hidden{position:absolute;inset:0;opacity:0;pointer-events:none;border:none;padding:0;}
+
+  /* ---------- Attendance (대시보드 콤팩트 라인) ---------- */
+  .att-line{display:flex;align-items:center;gap:10px;padding:5px 2px;border-bottom:1px solid var(--border);}
+  .att-line:last-child{border-bottom:none;}
+  .att-line-icon{color:var(--text-faint);flex:none;display:flex;}
+  .att-line-label{width:30px;flex:none;font-size:13px;color:var(--text-muted);}
+  .att-line-time{
+    font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:700;
+    font-size:16px;min-width:54px;
+  }
+  .att-line-time.pending{color:var(--text-faint);font-weight:600;}
+  .att-line-note{font-size:11.5px;color:var(--text-faint);margin-left:auto;}
+  .att-line .btn{margin-left:auto;}
+  .now-chip{
+    display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-muted);
+    background:var(--surface-alt);padding:4px 10px;border-radius:999px;
+  }
+
+  @media (max-width:880px){
+    .shell{grid-template-columns:1fr;}
+    .sidebar{
+      position:fixed;top:0;left:0;height:100%;width:248px;z-index:180;
+      transform:translateX(-100%);transition:transform .2s ease;box-shadow:var(--shadow-md);
+    }
+    .sidebar.nav-open{transform:translateX(0);}
+    .nav-backdrop.nav-open{
+      display:block;position:fixed;inset:0;background:rgba(10,11,18,.42);z-index:170;
+    }
+    .hamburger{display:flex;}
+    .topbar{padding:0 16px;}
+    .content{padding:18px 16px;}
+    .grid-stats{grid-template-columns:1fr;}
+    .grid-2{grid-template-columns:1fr;}
+    .form-grid{grid-template-columns:1fr;}
+    .row{flex-direction:column;}
+  }
+  @media (min-width:881px){
+    .hamburger{display:none;}
+  }
+</style>
+
+<div id="app"></div>
+<div id="toast-region" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ Icons ============ */
+  var ICON = {
+    dashboard:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1.2"/><rect x="11" y="3" width="6" height="6" rx="1.2"/><rect x="3" y="11" width="6" height="6" rx="1.2"/><rect x="11" y="11" width="6" height="6" rx="1.2"/></svg>',
+    leave:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="14" height="13" rx="1.6"/><line x1="3" y1="8" x2="17" y2="8"/><line x1="6.5" y1="2.5" x2="6.5" y2="5.5"/><line x1="13.5" y1="2.5" x2="13.5" y2="5.5"/><path d="M6.5 12.5l1.6 1.6 3-3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    daily:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="2.5" width="12" height="15" rx="1.4"/><line x1="7" y1="7" x2="13" y2="7"/><line x1="7" y1="10.2" x2="13" y2="10.2"/><line x1="7" y1="13.4" x2="10.5" y2="13.4"/></svg>',
+    weekly:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3.5" width="14" height="13" rx="1.4"/><line x1="3" y1="8" x2="17" y2="8"/><line x1="6.5" y1="11" x2="6.5" y2="13.2"/><line x1="10" y1="11" x2="10" y2="13.2"/><line x1="13.5" y1="11" x2="13.5" y2="13.2"/></svg>',
+    approvals:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 11.5V5.6C3 4.7 3.7 4 4.6 4h10.8c.9 0 1.6.7 1.6 1.6v5.9" stroke-linecap="round"/><path d="M3 11.5l2.6 4.2c.3.5.9.8 1.5.8h5.8c.6 0 1.2-.3 1.5-.8l2.6-4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11.5h4.3l1 1.7h3.4l1-1.7H17" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    logout:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 3H5.6C4.7 3 4 3.7 4 4.6v10.8c0 .9.7 1.6 1.6 1.6H8" stroke-linecap="round"/><path d="M13 13.5l4-3.5-4-3.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="17" y1="10" x2="8.3" y2="10" stroke-linecap="round"/></svg>',
+    close:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><line x1="5" y1="5" x2="15" y2="15" stroke-linecap="round"/><line x1="15" y1="5" x2="5" y2="15" stroke-linecap="round"/></svg>',
+    check:'<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10.5l4 4 8-9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    calendar:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="14" height="13" rx="1.6"/><line x1="3" y1="8" x2="17" y2="8"/><line x1="6.5" y1="2.5" x2="6.5" y2="5.5"/><line x1="13.5" y1="2.5" x2="13.5" y2="5.5"/><circle cx="7" cy="11.3" r="1"/><circle cx="10" cy="11.3" r="1"/><circle cx="13" cy="11.3" r="1"/></svg>',
+    company:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="2.5" width="9" height="15" rx="1"/><line x1="6.5" y1="5.5" x2="6.5" y2="5.5" stroke-linecap="round"/><line x1="9.5" y1="5.5" x2="9.5" y2="5.5" stroke-linecap="round"/><line x1="6.5" y1="8.2" x2="6.5" y2="8.2" stroke-linecap="round"/><line x1="9.5" y1="8.2" x2="9.5" y2="8.2" stroke-linecap="round"/><line x1="6.5" y1="10.9" x2="6.5" y2="10.9" stroke-linecap="round"/><line x1="9.5" y1="10.9" x2="9.5" y2="10.9" stroke-linecap="round"/><path d="M13 7.5h3v10h-3" /></svg>',
+    users:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7.3" cy="6.3" r="2.4"/><path d="M2.5 16c0-2.6 2.1-4.3 4.8-4.3s4.8 1.7 4.8 4.3" stroke-linecap="round"/><circle cx="14.3" cy="6.8" r="1.9"/><path d="M12.7 11.9c2 .2 3.8 1.7 3.8 4" stroke-linecap="round"/></svg>',
+    approvalLine:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="4" cy="4.5" r="1.8"/><circle cx="10" cy="10" r="1.8"/><circle cx="16" cy="15.5" r="1.8"/><path d="M5.5 5.8l3 2.6M11.5 11.3l3 2.6" stroke-linecap="round"/></svg>',
+    leavePolicy:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="4" y1="4" x2="4" y2="16" stroke-linecap="round"/><circle cx="4" cy="7" r="1.6" fill="currentColor" stroke="none"/><line x1="10" y1="4" x2="10" y2="16" stroke-linecap="round"/><circle cx="10" cy="12" r="1.6" fill="currentColor" stroke="none"/><line x1="16" y1="4" x2="16" y2="16" stroke-linecap="round"/><circle cx="16" cy="9" r="1.6" fill="currentColor" stroke="none"/></svg>',
+    plus:'<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="4" x2="10" y2="16" stroke-linecap="round"/><line x1="4" y1="10" x2="16" y2="10" stroke-linecap="round"/></svg>',
+    trash:'<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h12" stroke-linecap="round"/><path d="M8 6V4.5h4V6" stroke-linecap="round"/><path d="M5.5 6l.7 9.5a1 1 0 001 .9h5.6a1 1 0 001-.9L14.5 6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    upload:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 13V4M10 4l-3 3M10 4l3 3" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 13v2.5a1 1 0 001 1h10a1 1 0 001-1V13" stroke-linecap="round"/></svg>',
+    clock:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10.5" r="7"/><path d="M10 6.5v4l2.8 1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="7.5" y1="2.3" x2="12.5" y2="2.3" stroke-linecap="round"/></svg>',
+    signIn:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4H5.6C4.7 4 4 4.7 4 5.6v8.8c0 .9.7 1.6 1.6 1.6H8" stroke-linecap="round"/><path d="M11 13l4-3.5-4-3.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="15" y1="9.5" x2="7.5" y2="9.5" stroke-linecap="round"/></svg>',
+    idcard:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4" width="15" height="12" rx="1.6"/><circle cx="7" cy="9" r="1.7"/><path d="M4.3 13.3c.4-1.4 1.5-2.1 2.7-2.1s2.3.7 2.7 2.1" stroke-linecap="round"/><line x1="12" y1="7.8" x2="15" y2="7.8" stroke-linecap="round"/><line x1="12" y1="10.2" x2="15" y2="10.2" stroke-linecap="round"/></svg>',
+    chevron:'<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 8l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    overtime:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8.5" cy="11" r="6.5"/><path d="M8.5 7.8v3.2l2.2 1.3" stroke-linecap="round" stroke-linejoin="round"/><line x1="15.5" y1="4" x2="15.5" y2="8" stroke-linecap="round"/><line x1="13.5" y1="6" x2="17.5" y2="6" stroke-linecap="round"/></svg>',
+    board:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="14" height="14" rx="1.4"/><line x1="6" y1="7" x2="14" y2="7" stroke-linecap="round"/><line x1="6" y1="10" x2="14" y2="10" stroke-linecap="round"/><line x1="6" y1="13" x2="11" y2="13" stroke-linecap="round"/></svg>',
+    pin:'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" stroke="none"><path d="M11.3 2.3c.4-.4 1-.4 1.4 0l5 5c.4.4.4 1 0 1.4-.4.4-1 .4-1.4 0l-.2-.2-3 3 .6 3.3c.1.4-.1.8-.4 1l-.6.3-3.4-3.4-3.6 3.6a.7.7 0 01-1-1l3.6-3.6-3.4-3.4.3-.6c.2-.3.6-.5 1-.4l3.3.6 3-3-.2-.2c-.4-.4-.4-1 0-1.4z"/></svg>',
+    clip:'<svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6.5 10.2l5.3-5.3a2.6 2.6 0 013.7 3.7l-6.5 6.5a4.2 4.2 0 01-6-6l6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    trip:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6.5" width="14" height="9.5" rx="1.4"/><path d="M7.5 6.5V5a1.5 1.5 0 011.5-1.5h2A1.5 1.5 0 0112.5 5v1.5" stroke-linecap="round"/><line x1="3" y1="10.5" x2="17" y2="10.5"/></svg>',
+    tripReport:'<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="2.5" width="12" height="15" rx="1.4"/><line x1="7" y1="6.5" x2="13" y2="6.5" stroke-linecap="round"/><line x1="7" y1="9.3" x2="13" y2="9.3" stroke-linecap="round"/><circle cx="8.6" cy="13" r="1.9"/><path d="M8.6 12v2M7.8 12.5h1.6" stroke-linecap="round"/></svg>',
+    bell:'<svg width="19" height="19" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 8.2a5 5 0 0110 0c0 3.1.8 4.4 1.6 5.2.3.3.1.9-.3.9H3.7c-.4 0-.6-.6-.3-.9C4.2 12.6 5 11.3 5 8.2z" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.2 16.3a1.9 1.9 0 003.6 0" stroke-linecap="round"/></svg>'
+  };
+
+  /* ============ Mock data (in-memory) ============ */
+  var TODAY = '2026-08-13';
+  var TODAY_LABEL = '2026년 8월 13일 (목)';
+
+  var ME = { name:'김도윤', dept:'마케팅팀', position:'대리', email:'dyoon.kim@nugw.co.kr', hireDate:'2024-03-04', initials:'김도' };
+
+  // 인사기록카드(표준서식) — 본인 입력
+  var HR_RECORD = {
+    nameKr:ME.name, nameEn:'', birth:'', gender:'남', mobile:'', email:ME.email, address:'',
+    emergencyRelation:'', emergencyName:'', emergencyPhone:'',
+    education:[],
+    career:[],
+    certificates:[],
+    militaryStatus:'해당없음', militaryBranch:'', militaryRank:'', militaryPeriod:'',
+    family:[],
+    agreed:false, submittedAt:null
+  };
+
+  var CATEGORY_LABEL = { ANNUAL_DEDUCT:'연차 차감형', SPECIAL:'특별휴가', OFFICIAL:'공가' };
+
+  var INPUT_MODE_LABEL = { DAY_RANGE:'일 단위', HOUR_RANGE:'시간 단위' };
+
+  var LEAVE_TYPES = [
+    { code:'ANNUAL_DAY', name:'연차(일)', inputMode:'DAY_RANGE', category:'ANNUAL_DEDUCT', requireAttachment:false, payType:'PAID' },
+    { code:'ANNUAL_HOUR', name:'연차(시간)', inputMode:'HOUR_RANGE', category:'ANNUAL_DEDUCT', requireAttachment:false, payType:'PAID' },
+    { code:'CONGRATS', name:'경조사', inputMode:'DAY_RANGE', category:'SPECIAL', requireAttachment:true, payType:'PAID' },
+    { code:'SICK', name:'병가', inputMode:'DAY_RANGE', category:'SPECIAL', requireAttachment:true, payType:'UNPAID' },
+    { code:'OFFICIAL', name:'공가(예비군·건강검진 등)', inputMode:'DAY_RANGE', category:'OFFICIAL', requireAttachment:true, payType:'PAID' }
+  ];
+
+  var DEPARTMENTS = [
+    { id:1, name:'마케팅팀', leaveBasis:null },
+    { id:2, name:'디자인팀', leaveBasis:null },
+    { id:3, name:'개발팀', leaveBasis:'HIRE_DATE' },
+    { id:4, name:'영업팀', leaveBasis:null }
+  ];
+
+  var COMPANY = {
+    name:'(주)엔유지더블유', bizNo:'123-45-67890', ceo:'정하나', workSchedule:'주 5일 (월~금, 09:00~18:00)', defaultLeaveBasis:'FISCAL_YEAR',
+    workStartTime:'09:00', workEndTime:'18:00',
+    standardWorkHoursPerDay:8, lunchStart:'12:00', lunchEnd:'13:00', hourlyLeaveUnitHours:2, hourlyLeaveMaxHours:6,
+    dailyAllowanceRate:30000, mealAllowanceRate:25000
+  };
+
+  var USERS = [
+    { id:1, name:'김도윤', dept:'마케팅팀', position:'대리', role:'ADMIN', hireDate:'2024-03-04', status:'재직' },
+    { id:2, name:'정민아', dept:'마케팅팀', position:'팀장', role:'APPROVER', hireDate:'2019-05-12', status:'재직' },
+    { id:3, name:'이하준', dept:'마케팅팀', position:'사원', role:'MEMBER', hireDate:'2025-01-06', status:'재직' },
+    { id:4, name:'박서연', dept:'디자인팀', position:'주임', role:'MEMBER', hireDate:'2023-09-18', status:'재직' },
+    { id:5, name:'정하늘', dept:'개발팀', position:'사원', role:'MEMBER', hireDate:'2025-07-01', status:'재직' },
+    { id:6, name:'최지우', dept:'영업팀', position:'대리', role:'MEMBER', hireDate:'2022-11-03', status:'재직' }
+  ];
+
+  var LEAVE_POLICY = [
+    { id:1, minYears:0, maxYears:1, grantDays:11 },
+    { id:2, minYears:1, maxYears:3, grantDays:15 },
+    { id:3, minYears:3, maxYears:5, grantDays:16 },
+    { id:4, minYears:5, maxYears:10, grantDays:18 }
+  ];
+
+  // key: "부서|문서유형" -> steps (승인자 이름 배열, 순서대로)
+  var APPROVAL_LINES = {
+    '마케팅팀|LEAVE': ['정민아 팀장'],
+    '마케팅팀|DAILY': ['정민아 팀장'],
+    '마케팅팀|WEEKLY': ['정민아 팀장', '오세훈 본부장'],
+    '디자인팀|LEAVE': ['한소진 팀장'],
+    '개발팀|LEAVE': ['류지호 팀장', '오세훈 본부장'],
+    '영업팀|LEAVE': ['배승우 팀장']
+  };
+
+  var nextEventId = 3;
+  var EVENTS = [
+    { id:1, title:'전사 워크숍', startDate:'2026-08-21', endTime:'', startTime:'10:00', endTimeLabel:'17:00', location:'본사 대강당', desc:'하반기 전사 워크숍 및 팀빌딩', createdBy:'김도윤', dept:null },
+    { id:2, title:'마케팅팀 주간회의', startDate:'2026-08-14', startTime:'10:00', endTimeLabel:'11:00', location:'회의실 A', desc:'', createdBy:'정민아', dept:'마케팅팀' }
+  ];
+
+  // 사내게시판(일반게시판) — 관리자만 공지사항으로 등록 가능
+  var nextBoardId = 5;
+  var BOARD_POSTS = [
+    { id:1, title:'2026년 하반기 전사 워크숍 안내', content:'8/21(금) 전사 워크숍이 진행됩니다.\n장소: 본사 대강당\n일정: 10:00~17:00\n참석 여부는 각 팀장에게 회신 부탁드립니다.', author:'김도윤', dept:'마케팅팀', createdAt:'2026-08-10', isNotice:true, attachmentName:'하반기_워크숍_일정표.pdf' },
+    { id:2, title:'사내 보안 정책 업데이트 안내', content:'8월부터 비밀번호 정책이 변경됩니다.\n- 8자 이상, 특수문자 1개 이상 포함\n- 90일마다 변경 필요\n자세한 내용은 IT팀에 문의 바랍니다.', author:'정민아', dept:'마케팅팀', createdAt:'2026-08-05', isNotice:true, attachmentName:null },
+    { id:3, title:'회의실 예약 시스템 점검 안내', content:'8/14(금) 새벽 2시~4시 회의실 예약 시스템 점검이 있습니다. 해당 시간에는 예약 기능 이용이 제한됩니다.', author:'이하준', dept:'마케팅팀', createdAt:'2026-08-12', isNotice:false, attachmentName:null },
+    { id:4, title:'점심 맛집 추천 받습니다', content:'회사 근처 새로 생긴 맛집 있으면 댓글 대신 여기에 추천 부탁드려요! 다음 주 팀 회식 장소 정할 때 참고하겠습니다.', author:'박서연', dept:'디자인팀', createdAt:'2026-08-11', isNotice:false, attachmentName:null }
+  ];
+
+  // 승인된 휴가(캘린더 표시 + 업무보고 연계용, 전사 구성원 대상)
+  var TEAM_LEAVES = [
+    { name:'김도윤', dept:'마케팅팀', type:'연차(일)', start:'2026-07-21', end:'2026-07-21' },
+    { name:'김도윤', dept:'마케팅팀', type:'경조사', start:'2026-05-02', end:'2026-05-03' },
+    { name:'김도윤', dept:'마케팅팀', type:'병가', start:'2026-08-06', end:'2026-08-06' },
+    { name:'이하준', dept:'마케팅팀', type:'연차(일)', start:'2026-08-14', end:'2026-08-14' },
+    { name:'정하늘', dept:'개발팀', type:'연차(시간)', start:'2026-08-07', end:'2026-08-07' },
+    { name:'최지우', dept:'영업팀', type:'연차(일)', start:'2026-08-20', end:'2026-08-20' },
+    { name:'박서연', dept:'디자인팀', type:'연차(일)', start:'2026-08-25', end:'2026-08-25' }
+  ];
+
+  // 데모용 가상 "현재 시각" — 실제 서비스에서는 서버 시각 기준으로 판단
+  var NOW_TIME = '15:30';
+
+  // 출퇴근 기록(본인). key: 'YYYY-MM-DD' -> {checkIn, checkOut}
+  var attendanceRecords = {
+    '2026-08-07': { checkIn:'08:57', checkOut:'18:22' },
+    '2026-08-10': { checkIn:'09:04', checkOut:'18:11' },
+    '2026-08-11': { checkIn:'08:49', checkOut:'19:35' },
+    '2026-08-12': { checkIn:'09:01', checkOut:'18:07' }
+  };
+
+  // 초과근무 신청(본인). 19:00 이후 퇴근 체크는 당일 승인된 신청이 있어야만 가능
+  var overtimeRequests = [
+    { id:1, date:'2026-08-13', expectedEndTime:'21:00', workDetail:'프로모션 캠페인 소재 최종 검수 및 발행 준비', reason:'출시 일정 임박으로 야간 작업 필요', status:'승인', approver:'정민아 팀장' }
+  ];
+  var nextOvertimeId=2;
+  function hasApprovedOvertime(dateKey){
+    return overtimeRequests.some(function(o){ return o.date===dateKey && o.status==='승인'; });
+  }
+
+  // 출장신청(본인) — 시외출장은 완료 후 3일 이내 출장결과보고 필요
+  var TRANSPORT_OPTIONS = ['KTX','고속버스','항공','자가용','법인차량'];
+  var nextTripId = 5;
+  var businessTrips = [
+    { id:1, tripType:'시외', startDate:'2026-07-30', endDate:'2026-08-01', destination:'부산 해운대', purpose:'거래처 정기 미팅 및 현장 실사', transport:'KTX', status:'승인', approver:'정민아 팀장', version:1, editedAt:null, report:null },
+    { id:2, tripType:'시외', startDate:'2026-08-10', endDate:'2026-08-11', destination:'대전 유성구', purpose:'협력사 공장 방문 및 품질 점검', transport:'고속버스', status:'승인', approver:'정민아 팀장', version:1, editedAt:null, report:null },
+    { id:3, tripType:'관내', startDate:'2026-08-07', endDate:'2026-08-07', startTime:'10:00', endTime:'12:00', destination:'서울 강남구', purpose:'광고 대행사 미팅', transport:null, status:'승인', approver:'정민아 팀장', version:1, editedAt:null, report:null },
+    { id:4, tripType:'시외', startDate:'2026-08-20', endDate:'2026-08-21', destination:'광주 서구', purpose:'신규 거래처 발굴 미팅', transport:'항공', status:'대기', approver:'정민아 팀장', version:1, editedAt:null, report:null }
+  ];
+  function tripReportDueInfo(trip){
+    // 시외출장 종료일 + 3일이 기한. TODAY 기준 남은 일수 계산(간이: 달력일 기준)
+    var due=new Date(trip.endDate+'T00:00:00'); due.setDate(due.getDate()+3);
+    var dueKey=toLocalKey(due);
+    var daysLeft = Math.round((due - new Date(TODAY+'T00:00:00')) / 86400000);
+    return { dueKey:dueKey, daysLeft:daysLeft, overdue: daysLeft<0 };
+  }
+
+  var balance = { granted:15, used:6.5 };
+
+  var leaveHistory = [
+    { id:5, typeCode:'ANNUAL_DAY', type:'연차(일)', category:'ANNUAL_DEDUCT', payType:'PAID', period:'2026-08-18', days:1, status:'대기', approver:'정민아 팀장', version:1, editedAt:null, startDate:'2026-08-18', endDate:'2026-08-18' },
+    { id:4, typeCode:'SICK', type:'병가', category:'SPECIAL', payType:'UNPAID', period:'2026-08-06', days:1, status:'승인', approver:'정민아 팀장', version:1, editedAt:null, startDate:'2026-08-06', endDate:'2026-08-06' },
+    { id:3, typeCode:'CONGRATS', type:'경조사', category:'SPECIAL', payType:'PAID', period:'2026-05-02 ~ 2026-05-03', days:2, status:'승인', approver:'정민아 팀장', version:1, editedAt:null, startDate:'2026-05-02', endDate:'2026-05-03' },
+    { id:2, typeCode:'ANNUAL_HOUR', type:'연차(시간)', category:'ANNUAL_DEDUCT', payType:'PAID', period:'2026-06-10 10:00~15:00 (4시간, 점심 제외)', days:0.5, status:'승인', approver:'정민아 팀장', version:1, editedAt:null, hourDate:'2026-06-10', hourStart:'10:00', hourDuration:4 },
+    { id:1, typeCode:'ANNUAL_DAY', type:'연차(일)', category:'ANNUAL_DEDUCT', payType:'PAID', period:'2026-07-21', days:1, status:'승인', approver:'정민아 팀장', version:1, editedAt:null, startDate:'2026-07-21', endDate:'2026-07-21' }
+  ];
+  var nextLeaveId = 6;
+
+  // keyed by date -> {result, plan, notes, status}
+  var dailyReports = {
+    '2026-08-10': { result:'신제품 런칭 콘텐츠 초안 3건 작성, 인플루언서 후보 20건 리스트업', plan:'콘텐츠 초안 팀 리뷰 및 1차 피드백 반영', notes:'', status:'승인', version:1, editedAt:null },
+    '2026-08-11': { result:'콘텐츠 초안 팀 리뷰 진행, 피드백 3건 반영 완료', plan:'광고 소재 제작 업체 견적 비교 및 협력사 컨택', notes:'', status:'승인', version:1, editedAt:null },
+    '2026-08-12': { result:'광고 소재 제작 업체 3곳 견적 비교 완료, 협력사 컨택 진행', plan:'마케팅 캠페인 A안 시안 검토 및 팀 공유, 협력사 미팅 자료 준비', notes:'협력사 미팅 일정 8/14로 조율 중', status:'승인', version:1, editedAt:null }
+  };
+
+  var weeklyReports = {
+    '2026-08-03': { result:'[8/3] 프로모션 소재 3건 제작\n[8/4] 채널별 발행 일정 수립\n[8/5] 인플루언서 협업 컨택 5건\n[8/6] 소재 성과 1차 리포트 작성\n[8/7] 주간 회의 자료 준비', plan:'신제품 런칭 콘텐츠 기획 착수, 협력사 미팅 일정 조율', notes:'', status:'승인' }
+  };
+
+  var approvalQueue = [
+    { id:101, type:'LEAVE', requester:'박서연', dept:'디자인팀', summary:'연차 2일 (08/18 ~ 08/19)', reason:'개인 사유로 연차 2일 신청드립니다. 담당 업무는 사전에 인수인계 예정입니다.', submittedAt:'2026-08-12', status:'PENDING' },
+    { id:102, type:'DAILY', requester:'이하준', dept:'마케팅팀', summary:'08/12 일일업무보고', fields:{ result:'신규 랜딩페이지 카피 초안 작성 및 SEO 키워드 정리', plan:'랜딩페이지 디자인팀 전달 및 리뷰 일정 조율', notes:'' }, submittedAt:'2026-08-12', status:'PENDING' },
+    { id:103, type:'WEEKLY', requester:'최지우', dept:'영업팀', summary:'08/04 ~ 08/08 주간업무보고', fields:{ result:'신규 거래처 3곳 미팅, 견적서 2건 발송', plan:'계약 조건 협의 및 내부 결재 상신', notes:'' }, submittedAt:'2026-08-08', status:'PENDING' },
+    { id:104, type:'LEAVE', requester:'정하늘', dept:'개발팀', summary:'연차(시간) 09:00~13:00 (08/07)', reason:'병원 진료로 오전 시간 연차 신청드립니다.', submittedAt:'2026-08-06', status:'APPROVED', decidedAt:'2026-08-06', comment:'승인합니다.' },
+    { id:105, type:'DAILY', requester:'김도윤', dept:'마케팅팀', summary:'08/11 일일업무보고', fields:{ result:'콘텐츠 초안 팀 리뷰 진행', plan:'광고 소재 제작 업체 견적 비교', notes:'' }, submittedAt:'2026-08-11', status:'APPROVED', decidedAt:'2026-08-11', comment:'수고했습니다.' },
+    { id:106, type:'OVERTIME', requester:'이하준', dept:'마케팅팀', summary:'08/13 초과근무 (~21:30)', otFields:{ date:'2026-08-13', expectedEndTime:'21:30', workDetail:'금주 캠페인 성과 리포트 마감 작업', reason:'클라이언트 보고 일정으로 당일 마감 필요' }, submittedAt:'2026-08-13', status:'PENDING' },
+    { id:107, type:'TRIP', requester:'최지우', dept:'영업팀', summary:'시외출장 · 대구 (08/17~08/18)', tripFields:{ tripType:'시외', startDate:'2026-08-17', endDate:'2026-08-18', destination:'대구 수성구', purpose:'신규 대리점 계약 협의', transport:'KTX' }, submittedAt:'2026-08-13', status:'PENDING' },
+    { id:108, type:'TRIP_REPORT', requester:'이하준', dept:'마케팅팀', summary:'출장결과보고 · 대전 (08/03~08/04)', trFields:{ workContent:'대전 협력사 방문, 신규 소재 샘플 3종 확인 및 단가 협의 완료', transport:'KTX', transportCost:45000, transportAttachmentName:'교통비_영수증.pdf', hasLodging:true, lodgingCost:80000, lodgingAttachmentName:'숙박비_영수증.pdf', dailyAllowance:60000, mealAllowance:50000 }, submittedAt:'2026-08-05', status:'PENDING' }
+  ];
+
+  var TYPE_LABEL = { LEAVE:'연차', DAILY:'일일업무보고', WEEKLY:'주간업무보고', OVERTIME:'초과근무', TRIP:'출장신청', TRIP_REPORT:'출장결과보고' };
+
+  /* ============ 알림(Notification) ============ */
+  var NOTIF_CATEGORY_LABEL = { APPROVAL_REQUEST:'결재 요청', APPROVAL_RESULT:'결재 결과', NOTICE:'공지사항', DEADLINE:'기한 알림' };
+  var nextNotifId = 1;
+  var notifications = [];
+  // opts.action: 알림 클릭 시 이동할 화면/상태를 세팅하는 콜백(선택)
+  function pushNotification(category, title, message, opts){
+    opts = opts || {};
+    notifications.unshift({
+      id: nextNotifId++,
+      category: category,
+      title: title,
+      message: message,
+      createdAt: opts.createdAt || TODAY,
+      read: false,
+      action: opts.action || null
+    });
+  }
+  function unreadNotificationCount(){
+    return notifications.filter(function(n){ return !n.read; }).length;
+  }
+  function notifTimeLabel(createdAt){
+    return createdAt===TODAY ? '오늘' : createdAt;
+  }
+
+  /* ============ State ============ */
+  var state = {
+    loggedIn:false,
+    screen:'dashboard',
+    approvalsTab:'PENDING',
+    approvalsTypeFilter:'ALL',
+    detailApprovalId:null,
+    detailReport:null, // {kind:'DAILY'|'WEEKLY', key}
+    navOpen:false,
+    calendarDeptFilter:'ALL',
+    attMonth:'2026-08',
+    attViewUserName:null,   // ADMIN 드릴다운 대상(null이면 전체 직원 요약 or 본인)
+    dayDetailKey:null,      // 'YYYY-MM-DD' when viewing all items for a day
+    showEventForm:false,
+    editEventId:null,       // event id being edited from day detail (delete-only UI, no edit form needed)
+    editingUserId:null,     // user id being edited in admin
+    apLineDept:'마케팅팀',
+    apLineDocType:'LEAVE',
+    userMenuOpen:false,
+    editingLeaveId:null,
+    editingLeaveVersion:null,
+    editingDaily:false,
+    editingDailyVersion:null,
+    boardMode:'view',      // 'view' | 'write'
+    boardSelectedId:null,
+    tripReportSelectedId:null,
+    notifOpen:false
+  };
+
+  /* ============ Helpers ============ */
+  function el(html){
+    var t=document.createElement('template');
+    t.innerHTML=html.trim();
+    return t.content.firstElementChild;
+  }
+  function fmtDay(n){
+    var s = (Math.round(n*100)/100).toString();
+    return s+'일';
+  }
+  function remaining(){ return balance.granted - balance.used; }
+
+  function toast(msg){
+    var region=document.getElementById('toast-region');
+    var t=el('<div class="toast">'+iconWrap(ICON.check)+'<span>'+msg+'</span></div>');
+    region.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 2600);
+  }
+  function iconWrap(svg){ return '<span style="display:flex;color:var(--success)">'+svg+'</span>'; }
+
+  function pendingApprovalCount(){
+    return approvalQueue.filter(function(a){return a.status==='PENDING';}).length;
+  }
+
+  function businessDaysBetween(startStr, endStr){
+    var start=new Date(startStr+'T00:00:00'), end=new Date(endStr+'T00:00:00');
+    if(isNaN(start)||isNaN(end)||end<start) return 0;
+    var count=0, d=new Date(start);
+    while(d<=end){
+      var wd=d.getDay();
+      if(wd!==0 && wd!==6) count++;
+      d.setDate(d.getDate()+1);
+    }
+    return count;
+  }
+
+  function weekRangeLabel(startStr){
+    var start=new Date(startStr+'T00:00:00');
+    var end=new Date(start); end.setDate(end.getDate()+4);
+    function f(d){ return (d.getMonth()+1)+'/'+d.getDate(); }
+    return f(start)+' ~ '+f(end)+' (월~금)';
+  }
+
+  function pad2(n){ return n<10 ? '0'+n : ''+n; }
+  function toLocalKey(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+
+  function aggregateWeek(startStr){
+    var start=new Date(startStr+'T00:00:00');
+    var lines=[];
+    for(var i=0;i<5;i++){
+      var d=new Date(start); d.setDate(d.getDate()+i);
+      var key=toLocalKey(d);
+      if(dailyReports[key]){
+        var mm=d.getMonth()+1, dd=d.getDate();
+        lines.push('['+mm+'/'+dd+'] '+dailyReports[key].result);
+      }
+    }
+    return lines;
+  }
+
+  function escapeHtml(s){
+    return (s||'').replace(/[&<>"]/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    });
+  }
+  // 연락처 실시간 자동 하이픈 변환: 010-0000-0000 형식
+  function attachPhoneFormat(inputEl, obj, key){
+    inputEl.placeholder='010-0000-0000';
+    inputEl.setAttribute('inputmode','numeric');
+    inputEl.addEventListener('input', function(){
+      var digits=inputEl.value.replace(/\D/g,'').slice(0,11);
+      var out=digits;
+      if(digits.length>7) out=digits.slice(0,3)+'-'+digits.slice(3,7)+'-'+digits.slice(7);
+      else if(digits.length>3) out=digits.slice(0,3)+'-'+digits.slice(3);
+      inputEl.value=out;
+      obj[key]=out;
+    });
+  }
+
+  // 금액 입력: 숫자만 입력하면 천 단위 콤마(,) 자동 표시. onChange(numericValue)로 실제 금액 전달
+  function attachMoneyFormat(inputEl, onChange){
+    inputEl.setAttribute('inputmode','numeric');
+    inputEl.addEventListener('input', function(){
+      var digits=inputEl.value.replace(/\D/g,'');
+      var num = digits ? parseInt(digits,10) : 0;
+      inputEl.value = digits ? num.toLocaleString() : '';
+      onChange(num);
+    });
+  }
+
+  // 출장일수(당일 포함, 달력일 기준 — 일비/식비 산정용)
+  function calendarDaysBetween(startStr, endStr){
+    var s=new Date(startStr+'T00:00:00'), e=new Date(endStr+'T00:00:00');
+    if(isNaN(s)||isNaN(e)||e<s) return 0;
+    return Math.round((e-s)/86400000)+1;
+  }
+
+  // 날짜 입력: 숫자만 입력하면 YYYY-MM-DD로 자동 하이픈 변환(연도 4자리 고정) + 달력 아이콘으로 네이티브 선택
+  // 반환: {el, getValue, setValue, setMin}
+  function makeDateField(value, onChange, opts){
+    opts=opts||{};
+    var wrap=el('<div class="date-group"></div>');
+    var text=el('<input class="input" type="text" inputmode="numeric" placeholder="YYYY-MM-DD" maxlength="10" value="'+escapeHtml(value||'')+'" />');
+    var iconBtn=el('<button type="button" class="date-icon-btn" aria-label="달력에서 선택">'+ICON.calendar+'</button>');
+    var hidden=el('<input type="date" class="date-hidden" tabindex="-1" aria-hidden="true" />');
+    if(opts.min) hidden.min=opts.min;
+    if(opts.max) hidden.max=opts.max;
+
+    function formatDigits(raw){
+      var d=raw.replace(/\D/g,'').slice(0,8); // YYYYMMDD, 연도 4자리 고정
+      if(d.length<=4) return d;
+      if(d.length<=6) return d.slice(0,4)+'-'+d.slice(4);
+      return d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6);
+    }
+    text.addEventListener('input', function(){
+      var formatted=formatDigits(text.value);
+      text.value=formatted;
+      onChange(formatted);
+    });
+    iconBtn.addEventListener('click', function(){
+      if(/^\d{4}-\d{2}-\d{2}$/.test(text.value)) hidden.value=text.value;
+      if(hidden.showPicker){ try{ hidden.showPicker(); }catch(e){ hidden.focus(); } }
+      else { hidden.focus(); hidden.click(); }
+    });
+    hidden.addEventListener('change', function(){
+      text.value=hidden.value;
+      onChange(hidden.value);
+    });
+
+    wrap.appendChild(text);
+    wrap.appendChild(iconBtn);
+    wrap.appendChild(hidden);
+    return {
+      el:wrap,
+      getValue:function(){ return text.value; },
+      setValue:function(v){ text.value=v||''; hidden.value=v||''; },
+      setMin:function(v){ hidden.min=v||''; }
+    };
+  }
+  function reportFieldLabels(kind){
+    return kind==='WEEKLY'
+      ? { f1:'금주 업무실적', f2:'차주 업무계획', f3:'보고사항' }
+      : { f1:'당일 업무실적', f2:'다음날 업무계획', f3:'보고사항' };
+  }
+  function fieldReadonly(label, value){
+    return '<div class="field"><label style="margin-bottom:6px;">'+label+'</label>'+
+      '<div class="body-box">'+(value ? escapeHtml(value) : '-')+'</div></div>';
+  }
+  function fieldsBlockHtml(kind, data){
+    var L=reportFieldLabels(kind);
+    var html='<div class="stack" style="gap:14px;">';
+    html+=fieldReadonly(L.f1, data.result);
+    html+=fieldReadonly(L.f2, data.plan);
+    if(data.notes) html+=fieldReadonly(L.f3, data.notes);
+    html+='</div>';
+    return html;
+  }
+
+  /* ============ Calendar helpers ============ */
+  function dateInRange(dateKey, start, end){ return dateKey>=start && dateKey<=end; }
+  function leavesOnDate(dateKey, deptFilter){
+    return TEAM_LEAVES.filter(function(lv){
+      var deptOk = !deptFilter || deptFilter==='ALL' || lv.dept===deptFilter;
+      return deptOk && dateInRange(dateKey, lv.start, lv.end);
+    });
+  }
+  function eventsOnDate(dateKey, deptFilter){
+    return EVENTS.filter(function(ev){
+      var deptOk = !deptFilter || deptFilter==='ALL' || !ev.dept || ev.dept===deptFilter;
+      return deptOk && ev.startDate===dateKey;
+    });
+  }
+  function myLeaveOnDate(dateKey){
+    return TEAM_LEAVES.find(function(lv){ return lv.name===ME.name && dateInRange(dateKey, lv.start, lv.end); });
+  }
+  function teamLeavesInRange(dept, startKey, endKey){
+    return TEAM_LEAVES.filter(function(lv){
+      return lv.dept===dept && lv.name!==ME.name && lv.start<=endKey && lv.end>=startKey;
+    });
+  }
+  function prevBusinessDayKey(dateKey){
+    var d=new Date(dateKey+'T00:00:00');
+    do{ d.setDate(d.getDate()-1); } while(d.getDay()===0 || d.getDay()===6);
+    return toLocalKey(d);
+  }
+
+  /* ============ Attendance (출퇴근) helpers ============ */
+  function isAdminUser(){
+    var u=USERS.find(function(x){return x.name===ME.name;});
+    return !!u && u.role==='ADMIN';
+  }
+  function hashSeed(str){
+    var h=0;
+    for(var i=0;i<str.length;i++){ h=(h*31+str.charCodeAt(i))>>>0; }
+    return h;
+  }
+  function minToHHMM(mins){ return pad2(Math.floor(mins/60))+':'+pad2(mins%60); }
+  function daysInMonth(ym){
+    var parts=ym.split('-'), y=Number(parts[0]), m=Number(parts[1]);
+    var last=new Date(y,m,0).getDate();
+    var arr=[];
+    for(var d=1; d<=last; d++){ arr.push(y+'-'+pad2(m)+'-'+pad2(d)); }
+    return arr;
+  }
+  // 특정 직원의 특정 날짜 근태 상태를 계산(본인은 실제 기록, 그 외 인원은 데모용 결정적 가상 기록)
+  function getAttendanceForDay(userName, dateKey){
+    var leave=TEAM_LEAVES.find(function(l){ return l.name===userName && dateInRange(dateKey,l.start,l.end); });
+    if(leave){
+      var cfg=LEAVE_TYPES.find(function(t){return t.name===leave.type;});
+      return { kind:'LEAVE', leaveType:leave.type, unpaid: !!(cfg && cfg.payType==='UNPAID') };
+    }
+    var d=new Date(dateKey+'T00:00:00');
+    var isWeekend = d.getDay()===0 || d.getDay()===6;
+    if(isWeekend) return { kind:'WEEKEND' };
+    if(dateKey>TODAY) return { kind:'FUTURE' };
+    if(userName===ME.name && dateKey===TODAY){
+      var rec=attendanceRecords[TODAY];
+      return (rec && rec.checkIn) ? { kind:'RECORD', checkIn:rec.checkIn, checkOut:rec.checkOut||null, auto:!!rec.auto } : { kind:'NONE' };
+    }
+    if(userName===ME.name && attendanceRecords[dateKey] && attendanceRecords[dateKey].checkIn){
+      var r=attendanceRecords[dateKey];
+      return { kind:'RECORD', checkIn:r.checkIn, checkOut:r.checkOut||null, auto:!!r.auto };
+    }
+    // 데모용 결정적 가상 출퇴근 시각(과거 평일)
+    var inMin = 520 + (hashSeed(userName+dateKey+'in')%40);   // 08:40~09:19
+    var outMin = 1080 + (hashSeed(userName+dateKey+'out')%90); // 18:00~19:29
+    return { kind:'RECORD', checkIn:minToHHMM(inMin), checkOut:minToHHMM(outMin) };
+  }
+  function monthSummary(userName, ym){
+    var out={present:0, leave:0, unpaidLeave:0, none:0};
+    daysInMonth(ym).forEach(function(k){
+      var a=getAttendanceForDay(userName, k);
+      if(a.kind==='RECORD') out.present++;
+      else if(a.kind==='LEAVE'){ out.leave++; if(a.unpaid) out.unpaidLeave++; }
+      else if(a.kind==='NONE') out.none++;
+    });
+    return out;
+  }
+
+  // 별도 퇴근 체크 없이 18:30이 지나면 당일 퇴근시간을 18:00으로 자동 저장
+  // (단, 당일 승인된 초과근무 신청이 있으면 계속 근무 중인 것으로 보고 자동 마감하지 않음)
+  function applyAutoCheckout(){
+    var rec=attendanceRecords[TODAY];
+    if(rec && rec.checkIn && !rec.checkOut && NOW_TIME>='18:30' && !hasApprovedOvertime(TODAY)){
+      rec.checkOut='18:00';
+      rec.auto=true;
+    }
+  }
+
+  /* ============ Render root ============ */
+  function render(){
+    applyAutoCheckout();
+    var app=document.getElementById('app');
+    app.innerHTML='';
+    if(!state.loggedIn){
+      app.appendChild(renderLogin());
+      return;
+    }
+    app.appendChild(renderShell());
+    if(state.detailApprovalId!==null){
+      app.appendChild(renderApprovalPanel());
+    }
+    if(state.detailReport){
+      app.appendChild(renderReportDetailPanel());
+    }
+    if(state.dayDetailKey){
+      app.appendChild(renderDayDetailPanel());
+    }
+    if(state.showEventForm){
+      app.appendChild(renderEventFormModal());
+    }
+    if(state.editingUserId!==null){
+      app.appendChild(renderUserEditPanel());
+    }
+  }
+
+  function openReportDetail(kind, key){ state.detailReport={kind:kind, key:key}; render(); }
+  function closeReportDetail(){ state.detailReport=null; render(); }
+
+  function renderReportDetailPanel(){
+    var kind=state.detailReport.kind, key=state.detailReport.key;
+    var store = kind==='DAILY' ? dailyReports : weeklyReports;
+    var data = store[key];
+    var title = kind==='DAILY' ? key+' 일일업무보고' : weekRangeLabel(key)+' 주간업무보고';
+
+    var overlay=el('<div class="overlay"></div>');
+    overlay.addEventListener('click', function(e){ if(e.target===overlay) closeReportDetail(); });
+
+    var panel=el('<div class="panel"></div>');
+    var head=el('<div class="panel-head"><div><span class="pill neutral">'+(kind==='DAILY'?'일일업무보고':'주간업무보고')+'</span><h2 style="margin-top:10px;font-size:17px;">'+title+'</h2></div></div>');
+    var closeBtn=el('<button class="icon-btn" type="button">'+ICON.close+'</button>');
+    closeBtn.addEventListener('click', closeReportDetail);
+    head.appendChild(closeBtn);
+    panel.appendChild(head);
+
+    panel.appendChild(el('<div class="kv-row"><span class="k">상태</span><span class="v">'+statusPill(data.status)+'</span></div>'));
+    panel.appendChild(el('<hr class="divider" />'));
+    panel.appendChild(el(fieldsBlockHtml(kind, data)));
+    panel.appendChild(el('<div class="helptext">이미 상신된 보고서는 읽기 전용으로 표시됩니다.</div>'));
+
+    overlay.appendChild(panel);
+    return overlay;
+  }
+
+  /* ============ Login screen ============ */
+  function renderLogin(){
+    var wrap=el('<div class="login-wrap"><div class="card login-card">'+
+      '<div class="login-brand">'+
+        '<div class="brand-mark">nu</div>'+
+        '<div><h1>nuGW 업무관리</h1><p>연차 · 결재 · 업무보고를 한 곳에서</p></div>'+
+      '</div>'+
+      '<form id="login-form" class="stack" style="gap:14px;">'+
+        '<div class="field"><label for="li-email">이메일</label><input class="input" id="li-email" type="email" value="dyoon.kim@nugw.co.kr" required /></div>'+
+        '<div class="field"><label for="li-pw">비밀번호</label><input class="input" id="li-pw" type="password" value="••••••••" required /></div>'+
+        '<button class="btn primary" type="submit" style="width:100%;padding:10px;">로그인</button>'+
+      '</form>'+
+      '<div class="login-demo"><b>목업 안내.</b> 실제 인증 없이 화면 확인용으로 제공되는 프로토타입입니다. 입력값과 무관하게 로그인됩니다.</div>'+
+    '</div></div>');
+    wrap.querySelector('#login-form').addEventListener('submit', function(e){
+      e.preventDefault();
+      state.loggedIn=true;
+      state.screen='dashboard';
+      render();
+    });
+    return wrap;
+  }
+
+  /* ============ Shell (sidebar + topbar + content) ============ */
+  var NAV_GROUPS = [
+    { label:null, items:[
+      { key:'dashboard', label:'대시보드', icon:ICON.dashboard },
+      { key:'calendar', label:'캘린더', icon:ICON.calendar },
+      { key:'board', label:'사내게시판', icon:ICON.board }
+    ]},
+    { label:'업무보고', items:[
+      { key:'daily', label:'일일업무보고', icon:ICON.daily },
+      { key:'weekly', label:'주간업무보고', icon:ICON.weekly },
+      { key:'trip-report', label:'출장결과보고', icon:ICON.tripReport },
+      { key:'approvals', label:'결재함', icon:ICON.approvals, badge:true }
+    ]},
+    { label:'근태관리', items:[
+      { key:'attendance', label:'출·퇴근', icon:ICON.clock },
+      { key:'overtime', label:'초과근무 신청', icon:ICON.overtime },
+      { key:'trip', label:'출장신청', icon:ICON.trip },
+      { key:'leave', label:'연차 신청', icon:ICON.leave }
+    ]}
+  ];
+  var ADMIN_NAV = [
+    { key:'admin-company', label:'회사 기본정보', icon:ICON.company },
+    { key:'admin-users', label:'조직/사용자 관리', icon:ICON.users },
+    { key:'admin-approval-lines', label:'결재선 설정', icon:ICON.approvalLine },
+    { key:'admin-leave-policy', label:'연차정책 설정', icon:ICON.leavePolicy }
+  ];
+  var TITLES = {
+    dashboard:['대시보드','오늘의 현황을 한눈에 확인하세요'],
+    leave:['연차 신청','유형을 선택하고 잔여연차를 확인한 뒤 상신하세요'],
+    overtime:['초과근무 신청','승인이 있어야 19:00 이후 퇴근 체크가 가능합니다'],
+    trip:['출장신청','관내·시외출장을 신청하세요'],
+    'trip-report':['출장결과보고','시외출장 완료 후 3일 이내 결과보고와 출장비를 청구하세요'],
+    calendar:['캘린더','승인된 휴가와 사내 일정을 한눈에 확인하세요'],
+    board:['사내게시판','공지사항과 자유 게시글을 확인하세요'],
+    attendance:['출퇴근','월별 근태 현황을 조회하세요'],
+    daily:['일일업무보고',TODAY_LABEL],
+    weekly:['주간업무보고','전일 계획 · 금주 실적을 자동으로 정리해드려요'],
+    approvals:['결재함','내게 배정된 결재 건을 처리하세요'],
+    'admin-company':['회사 기본정보','시스템 전체에 적용되는 회사 정보를 관리하세요'],
+    'admin-users':['조직/사용자 관리','구성원의 부서·직급·권한을 관리하세요'],
+    'admin-approval-lines':['결재선 설정','부서 × 문서유형별 결재 라인을 설정하세요'],
+    'admin-leave-policy':['연차정책 설정','발생일수 기준과 연차 유형을 관리하세요'],
+    'hr-record':['인사기록카드','표준서식에 따라 본인 인사정보를 입력하세요']
+  };
+
+  function renderShell(){
+    var shell=el('<div class="shell"></div>');
+    var backdrop=el('<div class="nav-backdrop'+(state.navOpen?' nav-open':'')+'"></div>');
+    backdrop.addEventListener('click', function(){ state.navOpen=false; render(); });
+    shell.appendChild(backdrop);
+    var sidebar=el('<aside class="sidebar'+(state.navOpen?' nav-open':'')+'"></aside>');
+    shell.appendChild(sidebar);
+    var main=el('<div class="main"></div>');
+    shell.appendChild(main);
+
+    sidebar.appendChild(el('<div class="brand"><div class="brand-mark">nu</div><div class="brand-text"><b>nuGW</b><span>업무관리 플랫폼</span></div></div>'));
+
+    NAV_GROUPS.forEach(function(group){
+      if(group.label){ sidebar.appendChild(el('<div class="nav-group">'+group.label+'</div>')); }
+      group.items.forEach(function(item){
+        var cnt = item.badge ? pendingApprovalCount() : 0;
+        var btn=el('<button class="nav-item'+(state.screen===item.key?' active':'')+'" type="button">'+
+          item.icon+'<span>'+item.label+'</span>'+
+          (cnt>0?'<span class="badge-count">'+cnt+'</span>':'')+
+        '</button>');
+        btn.addEventListener('click', function(){ state.screen=item.key; state.navOpen=false; render(); });
+        sidebar.appendChild(btn);
+      });
+    });
+
+    if(isAdminUser()){
+      sidebar.appendChild(el('<div class="nav-group">관리자</div>'));
+      ADMIN_NAV.forEach(function(item){
+        var btn=el('<button class="nav-item'+(state.screen===item.key?' active':'')+'" type="button">'+
+          item.icon+'<span>'+item.label+'</span>'+
+        '</button>');
+        btn.addEventListener('click', function(){ state.screen=item.key; state.navOpen=false; render(); });
+        sidebar.appendChild(btn);
+      });
+    }
+
+    var foot=el('<div class="sidebar-foot"></div>');
+    if(state.userMenuOpen){
+      var userMenu=el('<div class="user-menu"></div>');
+      var hrBtn=el('<button class="nav-item" type="button">'+ICON.idcard+'<span>인사정보</span></button>');
+      hrBtn.addEventListener('click', function(){ state.screen='hr-record'; state.userMenuOpen=false; state.navOpen=false; render(); });
+      var logoutBtn=el('<button class="logout-btn" type="button">'+ICON.logout+'<span>로그아웃</span></button>');
+      logoutBtn.addEventListener('click', function(){ state.loggedIn=false; state.userMenuOpen=false; render(); });
+      userMenu.appendChild(hrBtn);
+      userMenu.appendChild(logoutBtn);
+      foot.appendChild(userMenu);
+    }
+    var chipBtn=el('<button class="user-chip" type="button" style="width:100%;border:none;background:none;cursor:pointer;border-radius:var(--r-sm);"><div class="avatar">'+ME.initials+'</div><div class="user-meta"><b>'+ME.name+' '+ME.position+'</b><span>'+ME.dept+'</span></div><span style="margin-left:auto;color:var(--text-faint);flex:none;">'+ICON.chevron+'</span></button>');
+    chipBtn.addEventListener('click', function(){ state.userMenuOpen=!state.userMenuOpen; render(); });
+    foot.appendChild(chipBtn);
+    sidebar.appendChild(foot);
+
+    var topbar=el('<div class="topbar"><div style="display:flex;align-items:center;gap:12px;"><button type="button" class="hamburger" aria-label="메뉴 열기"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><line x1="3" y1="5.5" x2="17" y2="5.5" stroke-linecap="round"/><line x1="3" y1="10" x2="17" y2="10" stroke-linecap="round"/><line x1="3" y1="14.5" x2="17" y2="14.5" stroke-linecap="round"/></svg></button><div><h1></h1><div class="sub"></div></div></div><div class="topbar-right"></div></div>');
+    topbar.querySelector('h1').textContent = TITLES[state.screen][0];
+    topbar.querySelector('.sub').textContent = TITLES[state.screen][1];
+
+    var notifWrap=el('<div class="notif-wrap"></div>');
+    var unreadCnt=unreadNotificationCount();
+    var notifBtn=el('<button type="button" class="notif-btn" aria-label="알림">'+ICON.bell+(unreadCnt>0?'<span class="notif-badge">'+(unreadCnt>9?'9+':unreadCnt)+'</span>':'')+'</button>');
+    notifBtn.addEventListener('click', function(e){ e.stopPropagation(); state.notifOpen=!state.notifOpen; render(); });
+    notifWrap.appendChild(notifBtn);
+    if(state.notifOpen){
+      var backdrop=el('<div class="notif-backdrop"></div>');
+      backdrop.addEventListener('click', function(){ state.notifOpen=false; render(); });
+      notifWrap.appendChild(backdrop);
+      notifWrap.appendChild(renderNotifDropdown());
+    }
+    topbar.querySelector('.topbar-right').appendChild(notifWrap);
+    topbar.querySelector('.topbar-right').appendChild(el('<span>'+TODAY_LABEL+'</span>'));
+    topbar.querySelector('.hamburger').addEventListener('click', function(){ state.navOpen=!state.navOpen; render(); });
+    main.appendChild(topbar);
+
+    var content=el('<div class="content"></div>');
+    var screenEl = {
+      dashboard: renderDashboard,
+      leave: renderLeaveScreen,
+      overtime: renderOvertimeScreen,
+      trip: renderBusinessTripScreen,
+      'trip-report': renderTripReportScreen,
+      calendar: renderCalendarScreen,
+      board: renderBoardScreen,
+      attendance: renderAttendanceScreen,
+      daily: renderDailyScreen,
+      weekly: renderWeeklyScreen,
+      approvals: renderApprovalsScreen,
+      'admin-company': renderAdminCompanyScreen,
+      'admin-users': renderAdminUsersScreen,
+      'admin-approval-lines': renderAdminApprovalLinesScreen,
+      'admin-leave-policy': renderAdminLeavePolicyScreen,
+      'hr-record': renderHrRecordScreen
+    }[state.screen]();
+    content.appendChild(screenEl);
+    main.appendChild(content);
+
+    return shell;
+  }
+
+  function renderNotifDropdown(){
+    var dd=el('<div class="notif-dropdown"></div>');
+    var head=el('<div class="notif-dropdown-head"><b>알림</b></div>');
+    if(unreadNotificationCount()>0){
+      var markAllBtn=el('<button type="button" class="notif-mark-all">모두 읽음</button>');
+      markAllBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        notifications.forEach(function(n){ n.read=true; });
+        render();
+      });
+      head.appendChild(markAllBtn);
+    }
+    dd.appendChild(head);
+
+    var list=el('<div class="notif-list"></div>');
+    if(notifications.length===0){
+      list.appendChild(el('<div class="notif-empty">새 알림이 없습니다.</div>'));
+    } else {
+      notifications.forEach(function(n){
+        var item=el('<button type="button" class="notif-item'+(n.read?'':' unread')+'">'+
+          '<span class="notif-dot'+(n.read?' hidden':'')+'"></span>'+
+          '<div class="notif-body"><div class="notif-title">'+escapeHtml(n.title)+'</div>'+
+          '<div class="notif-msg">'+escapeHtml(n.message)+'</div>'+
+          '<div class="notif-time">'+notifTimeLabel(n.createdAt)+' · '+NOTIF_CATEGORY_LABEL[n.category]+'</div></div>'+
+        '</button>');
+        item.addEventListener('click', function(){
+          n.read=true;
+          state.notifOpen=false;
+          if(n.action) n.action();
+          render();
+        });
+        list.appendChild(item);
+      });
+    }
+    dd.appendChild(list);
+    return dd;
+  }
+
+  /* ============ Dashboard ============ */
+  function renderDashboard(){
+    var wrap=el('<div class="stack"></div>');
+
+    var topRow=el('<div class="grid-2"></div>');
+    topRow.appendChild(renderAttendanceActionCard());
+
+    var dailyDone = dailyReports[TODAY] ? '제출 완료' : '미작성';
+    var statsCompact=el('<div class="card card-pad"><div class="card-head"><h2>오늘의 현황</h2></div><div class="kv"></div></div>');
+    var kv=statsCompact.querySelector('.kv');
+    kv.appendChild(el('<div class="kv-row"><span class="k">잔여 연차</span><span class="v num">'+remaining()+'일 <span style="font-weight:400;color:var(--text-faint);">/ '+balance.granted+'일</span></span></div>'));
+    kv.appendChild(el('<div class="kv-row"><span class="k">결재 대기</span><span class="v num">'+pendingApprovalCount()+'건</span></div>'));
+    kv.appendChild(el('<div class="kv-row"><span class="k">오늘 일일보고</span><span class="v">'+dailyDone+'</span></div>'));
+    topRow.appendChild(statsCompact);
+    wrap.appendChild(topRow);
+
+    var grid=el('<div class="grid-2"></div>');
+
+    var pendingCard=el('<div class="card card-pad"><div class="card-head"><h2>결재 대기함</h2><span class="hint">최근 순</span></div></div>');
+    var pendItems = approvalQueue.filter(function(a){return a.status==='PENDING';});
+    if(pendItems.length===0){
+      pendingCard.appendChild(el('<div class="empty">처리할 결재 건이 없습니다.</div>'));
+    } else {
+      pendItems.forEach(function(a){
+        var row=el('<div class="list-row">'+
+          '<span class="pill '+typePillClass(a.type)+'">'+TYPE_LABEL[a.type]+'</span>'+
+          '<div style="flex:1;min-width:0;"><div style="font-weight:600;">'+a.requester+' · '+a.dept+'</div>'+
+          '<div style="color:var(--text-faint);font-size:12.5px;">'+a.summary+'</div></div>'+
+          '<button class="btn ghost" type="button" style="flex:none;">보기</button>'+
+        '</div>');
+        row.querySelector('button').addEventListener('click', function(){ openApproval(a.id); });
+        pendingCard.appendChild(row);
+      });
+    }
+    grid.appendChild(pendingCard);
+
+    var activityCard=el('<div class="card card-pad"><div class="card-head"><h2>최근 활동</h2></div></div>');
+    var activities=[
+      { text:ME.name+'님이 08/12 일일업무보고를 상신했습니다.', pill:'success', pillText:'승인' },
+      { text:'연차 신청(08/18) 결재가 대기 중입니다.', pill:'warning', pillText:'대기' },
+      { text:'정하늘(개발팀)의 연차(시간) 신청을 승인했습니다.', pill:'success', pillText:'처리완료' }
+    ];
+    activities.forEach(function(a){
+      activityCard.appendChild(el('<div class="list-row"><span class="pill '+a.pill+'">'+a.pillText+'</span><div style="flex:1;font-size:13px;color:var(--text-muted);">'+a.text+'</div></div>'));
+    });
+    grid.appendChild(activityCard);
+
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  function typePillClass(type){
+    if(type==='LEAVE') return 'neutral';
+    if(type==='DAILY') return 'neutral';
+    return 'neutral';
+  }
+
+  /* ============ Leave request screen ============ */
+  function hourOptions(){
+    var opts=[];
+    for(var h=7; h<=21; h++){ opts.push(pad2(h)+':00'); }
+    return opts;
+  }
+
+  // 회사 등록 출퇴근 시간(COMPANY.workStartTime~workEndTime) 범위의 정시 목록
+  function workHourOptions(){
+    var s=parseInt(COMPANY.workStartTime,10), e=parseInt(COMPANY.workEndTime,10);
+    var opts=[];
+    for(var h=s; h<=e; h++){ opts.push(pad2(h)+':00'); }
+    return opts;
+  }
+
+  // 시작시각(정시)에서 사용시간(시간)만큼 근무시간을 소진했을 때의 종료시각을 계산(점심시간 자동 스킵)
+  function computeEndInfo(startH, durationHours){
+    var lunchS=parseInt(COMPANY.lunchStart,10), lunchE=parseInt(COMPANY.lunchEnd,10);
+    var t=startH, remaining=durationHours, lunchSkipped=false, guard=0;
+    while(remaining>0 && guard<48){
+      guard++;
+      if(t>=lunchS && t<lunchE){ t=lunchE; lunchSkipped=true; continue; }
+      t+=1; remaining-=1;
+    }
+    return { endHour:t, lunchSkipped:lunchSkipped };
+  }
+
+  // 시작시각 기준으로, 종료시각이 회사 등록 퇴근시간(COMPANY.workEndTime) 이내에 드는 사용시간 옵션만 반환
+  function validDurationsFor(startH){
+    var opts=[];
+    var unit=COMPANY.hourlyLeaveUnitHours, cap=COMPANY.hourlyLeaveMaxHours;
+    var maxHour=parseInt(COMPANY.workEndTime,10);
+    for(var d=unit; d<=cap; d+=unit){
+      var info=computeEndInfo(startH, d);
+      if(info.endHour<=maxHour) opts.push(d);
+    }
+    return opts;
+  }
+
+  function renderLeaveScreen(){
+    var wrap=el('<div class="grid-2"></div>');
+
+    // 수정 모드: 대기중이 아니게 되었으면(경쟁 상황) 자동으로 신규 신청 모드로 복귀
+    var editingEntry = state.editingLeaveId ? leaveHistory.find(function(h){return h.id===state.editingLeaveId;}) : null;
+    if(state.editingLeaveId && (!editingEntry || editingEntry.status!=='대기')){
+      toast('이미 처리되어 수정할 수 없습니다. 최신 상태로 갱신합니다.');
+      state.editingLeaveId=null;
+      editingEntry=null;
+    }
+
+    var formCard=el('<div class="card card-pad"><div class="card-head"><h2>'+(editingEntry?'연차 신청 수정':'연차 신청')+'</h2></div></div>');
+    if(editingEntry){
+      var cancelEditBtn=el('<button class="btn ghost" type="button" style="margin:-8px 0 12px;padding:5px 10px;font-size:12.5px;">← 수정 취소하고 새 신청으로</button>');
+      cancelEditBtn.addEventListener('click', function(){ state.editingLeaveId=null; render(); });
+      formCard.appendChild(cancelEditBtn);
+    }
+    var form=el('<form class="stack" style="gap:16px;"></form>');
+
+    var typeField=el('<div class="field"><label for="lv-type">신청 유형</label></div>');
+    var typeSel=el('<select class="input" id="lv-type"></select>');
+    ['ANNUAL_DEDUCT','SPECIAL','OFFICIAL'].forEach(function(cat){
+      var grp=el('<optgroup label="'+CATEGORY_LABEL[cat]+'"></optgroup>');
+      LEAVE_TYPES.filter(function(t){return t.category===cat;}).forEach(function(t){
+        var payTag = t.payType==='UNPAID' ? ' · 무급' : '';
+        grp.appendChild(el('<option value="'+t.code+'">'+t.name+payTag+'</option>'));
+      });
+      typeSel.appendChild(grp);
+    });
+    if(editingEntry) typeSel.value=editingEntry.typeCode;
+    typeField.appendChild(typeSel);
+    form.appendChild(typeField);
+
+    // --- 연차(일) 등 날짜범위 입력 ---
+    var dayRow=el('<div class="field-row"></div>');
+    var startField=el('<div class="field"><label>시작일</label></div>');
+    var endField=el('<div class="field"><label>종료일</label></div>');
+    var startDG=makeDateField(editingEntry && editingEntry.startDate ? editingEntry.startDate : '2026-08-20', function(){ updatePreview(); });
+    var endDG=makeDateField(editingEntry && editingEntry.endDate ? editingEntry.endDate : '2026-08-20', function(){ updatePreview(); });
+    startField.appendChild(startDG.el);
+    endField.appendChild(endDG.el);
+    dayRow.appendChild(startField); dayRow.appendChild(endField);
+    form.appendChild(dayRow);
+
+    // --- 연차(시간) 날짜+시작시간+사용시간 입력 ---
+    var hourRow=el('<div class="field-row" style="display:none;"></div>');
+    var hDateField=el('<div class="field"><label>날짜</label></div>');
+    var hDateDG=makeDateField(editingEntry && editingEntry.hourDate ? editingEntry.hourDate : '2026-08-20', function(){ updatePreview(); });
+    hDateField.appendChild(hDateDG.el);
+    var hStartField=el('<div class="field"><label>시작시간</label></div>');
+    var hStartSel=el('<select class="input"></select>');
+    workHourOptions().forEach(function(h){ hStartSel.appendChild(el('<option value="'+h+'">'+h+'</option>')); });
+    hStartSel.value = editingEntry && editingEntry.hourStart ? editingEntry.hourStart : COMPANY.workStartTime;
+    var hDurationField=el('<div class="field"><label>사용시간</label></div>');
+    var hDurationSel=el('<select class="input"></select>');
+
+    function refreshDurationOptions(){
+      var startH=parseInt(hStartSel.value,10);
+      var prevVal=hDurationSel.value;
+      var opts=validDurationsFor(startH);
+      hDurationSel.innerHTML='';
+      if(opts.length===0){
+        hDurationSel.appendChild(el('<option value="">선택 가능한 시간 없음</option>'));
+        hDurationSel.disabled=true;
+      } else {
+        hDurationSel.disabled=false;
+        opts.forEach(function(d){ hDurationSel.appendChild(el('<option value="'+d+'">'+d+'시간</option>')); });
+        // 이전 선택값이 여전히 유효하면 유지, 아니면 첫 옵션 선택
+        hDurationSel.value = opts.indexOf(Number(prevVal))>=0 ? prevVal : String(opts[0]);
+      }
+    }
+    hStartSel.addEventListener('change', function(){ refreshDurationOptions(); updatePreview(); });
+    hDurationSel.addEventListener('change', updatePreview);
+    hStartField.appendChild(hStartSel);
+    hDurationField.appendChild(hDurationSel);
+    hourRow.appendChild(hDateField); hourRow.appendChild(hStartField); hourRow.appendChild(hDurationField);
+    form.appendChild(hourRow);
+    refreshDurationOptions();
+    if(editingEntry && editingEntry.hourDuration && !hDurationSel.disabled){
+      var editDurStr=String(editingEntry.hourDuration);
+      if(Array.from(hDurationSel.options).some(function(o){return o.value===editDurStr;})){ hDurationSel.value=editDurStr; }
+    }
+
+    var hourHelp=el('<div class="helptext" style="display:none;">회사 근무시간('+COMPANY.workStartTime+'~'+COMPANY.workEndTime+') 안에서, 시작시간을 기준으로 신청 가능한 사용시간만 표시됩니다('+COMPANY.hourlyLeaveUnitHours+'시간 단위, 최대 '+COMPANY.hourlyLeaveMaxHours+'시간). 점심시간('+COMPANY.lunchStart+'~'+COMPANY.lunchEnd+')은 자동 제외됩니다.</div>');
+    form.appendChild(hourHelp);
+
+    var reasonField=el('<div class="field"><label for="lv-reason">사유</label><textarea class="input" id="lv-reason" rows="3" placeholder="예: 개인 사유">'+escapeHtml(editingEntry?editingEntry.reason||'':'')+'</textarea></div>');
+    form.appendChild(reasonField);
+
+    var preview=el('<div class="card" id="lv-preview" style="background:var(--surface-alt);border:1px dashed var(--border-strong);"><div style="padding:14px 16px;" class="kv"></div></div>');
+    var previewKv=preview.querySelector('.kv');
+    form.appendChild(preview);
+
+    var noDeductNote=el('<div class="helptext" id="lv-nodeduct" style="display:none;">이 유형은 연차에서 차감되지 않습니다.</div>');
+    form.appendChild(noDeductNote);
+
+    var unpaidNote=el('<div class="pill danger" id="lv-unpaid" style="display:none;align-self:flex-start;">무급 휴가입니다 — 해당일 급여에서 제외됩니다</div>');
+    form.appendChild(unpaidNote);
+
+    var attachField=el('<div class="field" id="lv-attach-field" style="display:none;">'+
+      '<label>증빙파일 <span id="lv-attach-required" style="font-weight:400;color:var(--danger);">(필수)</span></label>'+
+      '<div class="upload-box" id="lv-upload-box">'+ICON.upload+'<span id="lv-upload-text">예비군훈련확인서, 진단서, 청첩장 등 증빙파일을 첨부하세요</span></div>'+
+      '<input type="file" id="lv-file-input" style="display:none;" />'+
+    '</div>');
+    form.appendChild(attachField);
+
+    var errBox=el('<div class="helptext" style="color:var(--danger);display:none;" id="lv-error"></div>');
+    form.appendChild(errBox);
+
+    form.appendChild(el('<div class="btn-row"><button class="btn primary" type="submit">'+(editingEntry?'수정 저장':'결재 상신')+'</button></div>'));
+
+    var attached=false;
+    var fileInput=attachField.querySelector('#lv-file-input');
+    var uploadBox=attachField.querySelector('#lv-upload-box');
+    uploadBox.addEventListener('click', function(){ fileInput.click(); });
+    fileInput.addEventListener('change', function(){
+      attached = fileInput.files.length>0;
+      uploadBox.classList.toggle('filled', attached);
+      attachField.querySelector('#lv-upload-text').textContent = attached ? ('첨부됨: '+fileInput.files[0].name) : '예비군훈련확인서, 진단서, 청첩장 등 증빙파일을 첨부하세요';
+      form.querySelector('button[type=submit]').disabled = computeValidity();
+    });
+
+    function currentType(){ return LEAVE_TYPES.find(function(t){return t.code===typeSel.value;}); }
+
+    var lastRem = 0;
+    var lastHourInfo = null;
+    function computeValidity(){
+      var type=currentType();
+      if(type.inputMode==='HOUR_RANGE') return !(lastHourInfo && lastHourInfo.valid) || lastRem<0;
+      if(type.category==='ANNUAL_DEDUCT') return lastRem<0;
+      return type.requireAttachment && !attached;
+    }
+
+    // 시작~종료시간에서 점심시간을 자동 제외하고, 단위/상한을 검증
+    function calcHourInfo(startT, durationHours){
+      var startH=parseInt(startT,10);
+      if(!durationHours || isNaN(durationHours)){
+        return { usedHours:0, endHour:startH, lunchSkipped:false, valid:false, reason:'시작시간을 기준으로 신청 가능한 사용시간이 없습니다. 시작시간을 조정하세요.', days:0 };
+      }
+      var endInfo=computeEndInfo(startH, durationHours);
+      return {
+        usedHours:durationHours, endHour:endInfo.endHour, lunchSkipped:endInfo.lunchSkipped,
+        valid:true, reason:'', days: durationHours/COMPANY.standardWorkHoursPerDay
+      };
+    }
+
+    function updatePreview(){
+      var type=currentType();
+      var isHour = type.inputMode==='HOUR_RANGE';
+      var isDayRange = type.inputMode==='DAY_RANGE';
+      var isDeduct = type.category==='ANNUAL_DEDUCT';
+
+      dayRow.style.display = isDayRange ? '' : 'none';
+      hourRow.style.display = isHour ? '' : 'none';
+      hourHelp.style.display = isHour ? '' : 'none';
+      preview.style.display = isDeduct ? '' : 'none';
+      noDeductNote.style.display = isDeduct ? 'none' : '';
+      unpaidNote.style.display = type.payType==='UNPAID' ? 'inline-flex' : 'none';
+      attachField.style.display = isDeduct ? 'none' : '';
+      attachField.querySelector('#lv-attach-required').style.display = type.requireAttachment ? '' : 'none';
+      errBox.style.display='none';
+
+      var s,e2,days;
+
+      if(isHour){
+        var info=calcHourInfo(hStartSel.value, Number(hDurationSel.value));
+        lastHourInfo=info;
+        s=hDateDG.getValue(); e2=s;
+        days = info.valid ? info.days : 0;
+        lastRem = remaining()-days;
+        var lunchNote = info.lunchSkipped ? ' (점심시간 자동 제외)' : '';
+        previewKv.innerHTML = !info.valid ? '' :
+          '<div class="kv-row"><span class="k">종료 예정 시간</span><span class="v num">'+pad2(info.endHour)+':00'+lunchNote+'</span></div>'+
+          '<div class="kv-row" style="margin-top:8px;"><span class="k">환산 차감일수</span><span class="v num">'+fmtDay(days)+'</span></div>'+
+          '<div class="kv-row" style="margin-top:8px;"><span class="k">신청 후 잔여연차</span><span class="v num" style="'+(lastRem<0?'color:var(--danger);':'')+'">'+fmtDay(lastRem)+'</span></div>';
+        if(!info.valid){ errBox.textContent=info.reason; errBox.style.display=''; }
+        else if(lastRem<0){ errBox.textContent='잔여연차가 부족합니다.'; errBox.style.display=''; }
+      } else if(isDayRange){
+        endDG.setMin(startDG.getValue());
+        if(endDG.getValue() && startDG.getValue() && endDG.getValue()<startDG.getValue()){
+          endDG.setValue(startDG.getValue());
+        }
+        s=startDG.getValue(); e2=endDG.getValue();
+        days=businessDaysBetween(s,e2);
+        if(isDeduct){
+          lastRem=remaining()-days;
+          previewKv.innerHTML =
+            '<div class="kv-row"><span class="k">차감 일수</span><span class="v num">'+fmtDay(days)+'</span></div>'+
+            '<div class="kv-row" style="margin-top:8px;"><span class="k">신청 후 잔여연차</span><span class="v num" style="'+(lastRem<0?'color:var(--danger);':'')+'">'+fmtDay(lastRem)+'</span></div>';
+          if(lastRem<0){ errBox.textContent='잔여연차가 부족합니다.'; errBox.style.display=''; }
+        } else {
+          lastRem=0;
+        }
+      }
+
+      form.querySelector('button[type=submit]').disabled = computeValidity() || days<=0;
+      return { type:type, s:s, e:e2, days:days, isDeduct:isDeduct, isHour:isHour };
+    }
+    typeSel.addEventListener('change', updatePreview);
+
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var v = updatePreview();
+      if(v.days<=0) return;
+      if(v.isHour && (!lastHourInfo || !lastHourInfo.valid)) return;
+      if(!v.isDeduct && v.type.requireAttachment && !attached){ toast('증빙파일을 첨부해야 상신할 수 있습니다.'); return; }
+      var periodLabel;
+      if(v.isHour){
+        periodLabel = v.s+' '+hStartSel.value+'~'+pad2(lastHourInfo.endHour)+':00 ('+lastHourInfo.usedHours+'시간'+(lastHourInfo.lunchSkipped?', 점심 제외':'')+')';
+      } else {
+        periodLabel = v.s===v.e ? v.s : (v.s+' ~ '+v.e);
+      }
+      var reasonVal=reasonField.querySelector('textarea').value.trim();
+      var structured = v.isHour
+        ? { startDate:null, endDate:null, hourDate:v.s, hourStart:hStartSel.value, hourDuration:lastHourInfo.usedHours }
+        : { startDate:v.s, endDate:v.e, hourDate:null, hourStart:null, hourDuration:null };
+
+      if(state.editingLeaveId){
+        // ---- 수정 저장: 무결성 재검증(경쟁 상황 가드) ----
+        var live=leaveHistory.find(function(h){return h.id===state.editingLeaveId;});
+        if(!live || live.status!=='대기' || live.version!==state.editingLeaveVersion){
+          toast('이미 처리되어 수정할 수 없습니다. 최신 상태로 갱신합니다.');
+          state.editingLeaveId=null; state.editingLeaveVersion=null;
+          render();
+          return;
+        }
+        var wasDeduct = live.category==='ANNUAL_DEDUCT';
+        var tentativeRemaining = remaining() + (wasDeduct ? live.days : 0);
+        if(v.isDeduct && tentativeRemaining - v.days < 0){
+          toast('잔여연차가 부족합니다.');
+          return;
+        }
+        if(wasDeduct) balance.used -= live.days;
+        if(v.isDeduct) balance.used += v.days;
+        live.type=v.type.name; live.typeCode=v.type.code; live.category=v.type.category; live.payType=v.type.payType;
+        live.period=periodLabel; live.days=v.days; live.reason=reasonVal;
+        live.startDate=structured.startDate; live.endDate=structured.endDate;
+        live.hourDate=structured.hourDate; live.hourStart=structured.hourStart; live.hourDuration=structured.hourDuration;
+        live.version+=1; live.editedAt=TODAY;
+        state.editingLeaveId=null; state.editingLeaveVersion=null;
+        toast('신청 내용이 수정되었습니다.');
+        render();
+        return;
+      }
+
+      if(v.isDeduct && remaining()-v.days<0) return;
+      var newEntry = Object.assign({ id:nextLeaveId++, status:'대기', approver:'정민아 팀장', version:1, editedAt:null, reason:reasonVal,
+        type:v.type.name, typeCode:v.type.code, category:v.type.category, payType:v.type.payType, period:periodLabel, days:v.days }, structured);
+      leaveHistory.unshift(newEntry);
+      if(v.isDeduct) balance.used += v.days;
+      toast('연차 신청이 상신되었습니다.');
+      render();
+    });
+
+    formCard.appendChild(form);
+    setTimeout(updatePreview, 0);
+
+    var sideCard=el('<div class="card card-pad"><div class="card-head"><h2>신청 내역</h2><span class="hint">잔여 '+remaining()+'일 / 발생 '+balance.granted+'일</span></div></div>');
+    var wrapTable=el('<div class="table-wrap"></div>');
+    var table=el('<table><thead><tr><th>유형</th><th>기간</th><th>일수</th><th>상태</th><th></th></tr></thead><tbody></tbody></table>');
+    var tbody=table.querySelector('tbody');
+    if(leaveHistory.length===0){
+      tbody.appendChild(el('<tr><td colspan="5"><div class="empty">신청 내역이 없습니다.</div></td></tr>'));
+    }
+    leaveHistory.forEach(function(h){
+      var unpaidTag = h.payType==='UNPAID' ? ' <span class="pill danger" style="padding:1px 7px;">무급</span>' : '';
+      var editedTag = h.editedAt ? ' <span class="pill neutral" style="padding:1px 7px;">수정됨</span>' : '';
+      var tr=el('<tr><td>'+h.type+unpaidTag+editedTag+'</td><td class="num">'+h.period+'</td><td class="num">'+fmtDay(h.days)+'</td><td>'+statusPill(h.status)+'</td><td style="text-align:right;white-space:nowrap;"></td></tr>');
+      var actionTd=tr.lastElementChild;
+      if(h.status==='대기'){
+        var editBtn=el('<button class="btn ghost" type="button" style="padding:4px 8px;font-size:12px;">수정</button>');
+        editBtn.addEventListener('click', function(){
+          if(h.status!=='대기'){ toast('이미 처리되어 수정할 수 없습니다.'); render(); return; }
+          state.editingLeaveId=h.id; state.editingLeaveVersion=h.version; render();
+        });
+        var cancelBtn=el('<button class="btn ghost" type="button" style="padding:4px 8px;font-size:12px;color:var(--danger);">취소</button>');
+        cancelBtn.addEventListener('click', function(){
+          if(h.status!=='대기'){ toast('이미 처리되어 취소할 수 없습니다.'); render(); return; }
+          if(!confirm('이 연차 신청을 취소하시겠습니까?')) return;
+          if(h.category==='ANNUAL_DEDUCT') balance.used -= h.days;
+          h.status='회수'; h.version+=1;
+          toast('신청이 취소되었습니다.');
+          render();
+        });
+        actionTd.appendChild(editBtn);
+        actionTd.appendChild(cancelBtn);
+        var demoBtn=el('<button class="btn ghost" type="button" style="padding:4px 8px;font-size:11px;color:var(--text-faint);" title="결재자가 지금 막 처리했다고 가정(무결성 가드 데모)">⚡데모</button>');
+        demoBtn.addEventListener('click', function(){
+          h.status='승인'; h.version+=1;
+          pushNotification('APPROVAL_RESULT', h.type+' 승인', h.period+' '+h.type+' 신청이 승인되었습니다.', {
+            createdAt:TODAY, action:function(){ state.screen='leave'; }
+          });
+          toast('데모: 결재자가 방금 이 건을 승인 처리했습니다 (화면은 아직 갱신 전 — 위 "수정"/"취소"를 눌러보세요).');
+        });
+        actionTd.appendChild(demoBtn);
+      }
+      tbody.appendChild(tr);
+    });
+    wrapTable.appendChild(table);
+    sideCard.appendChild(wrapTable);
+
+    wrap.appendChild(formCard);
+    wrap.appendChild(sideCard);
+    return wrap;
+  }
+
+  /* ============ Overtime request screen (초과근무 신청) ============ */
+  function renderOvertimeScreen(){
+    var wrap=el('<div class="grid-2"></div>');
+
+    var formCard=el('<div class="card card-pad"><div class="card-head"><h2>초과근무 신청</h2></div></div>');
+    formCard.appendChild(el('<div class="helptext" style="margin:-6px 0 14px;">반드시 결재 승인이 있어야 하며, 승인된 신청 건이 있는 날에만 19:00 이후 퇴근 체크가 가능합니다.</div>'));
+
+    var form=el('<form class="stack" style="gap:16px;"></form>');
+
+    var dateField=el('<div class="field"><label>날짜</label></div>');
+    var dateDG=makeDateField(TODAY, function(){});
+    dateField.appendChild(dateDG.el);
+    form.appendChild(dateField);
+
+    var endField=el('<div class="field"><label for="ot-end">예상 퇴근시간</label><input class="input" id="ot-end" type="time" value="21:00" /></div>');
+    form.appendChild(endField);
+    var endWarn=el('<div class="helptext" id="ot-end-warn" style="display:none;color:var(--danger);">19:00 이후 시간을 입력하세요.</div>');
+    form.appendChild(endWarn);
+
+    var workField=el('<div class="field"><label for="ot-work">업무내용(상세)</label><textarea class="input" id="ot-work" rows="3" placeholder="예: 프로모션 소재 최종 검수 및 발행 준비"></textarea></div>');
+    form.appendChild(workField);
+
+    var reasonField=el('<div class="field"><label for="ot-reason">사유</label><textarea class="input" id="ot-reason" rows="2" placeholder="예: 출시 일정 임박으로 야간 작업 필요"></textarea></div>');
+    form.appendChild(reasonField);
+
+    form.appendChild(el('<div class="btn-row"><button class="btn primary" type="submit">결재 상신</button></div>'));
+
+    var endInput=endField.querySelector('input');
+    function validateEnd(){
+      var invalid = endInput.value && endInput.value<='19:00';
+      endWarn.style.display = invalid ? '' : 'none';
+      form.querySelector('button[type=submit]').disabled = invalid;
+      return !invalid;
+    }
+    endInput.addEventListener('input', validateEnd);
+    setTimeout(validateEnd, 0);
+
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      if(!validateEnd()) return;
+      var workDetail=workField.querySelector('textarea').value.trim();
+      var reason=reasonField.querySelector('textarea').value.trim();
+      if(!workDetail || !reason){ toast('업무내용과 사유를 입력하세요.'); return; }
+      overtimeRequests.unshift({
+        id:nextOvertimeId++, date:dateDG.getValue(), expectedEndTime:endInput.value,
+        workDetail:workDetail, reason:reason, status:'대기', approver:'정민아 팀장'
+      });
+      toast('초과근무 신청이 상신되었습니다.');
+      render();
+    });
+
+    formCard.appendChild(form);
+
+    var sideCard=el('<div class="card card-pad"><div class="card-head"><h2>신청 내역</h2></div></div>');
+    var tableWrap=el('<div class="table-wrap"></div>');
+    var table=el('<table><thead><tr><th>날짜</th><th>예상 퇴근</th><th>상태</th></tr></thead><tbody></tbody></table>');
+    var tbody=table.querySelector('tbody');
+    if(overtimeRequests.length===0){
+      tbody.appendChild(el('<tr><td colspan="3"><div class="empty">신청 내역이 없습니다.</div></td></tr>'));
+    }
+    overtimeRequests.forEach(function(o){
+      tbody.appendChild(el('<tr><td class="num">'+o.date+'</td><td class="num">'+o.expectedEndTime+'</td><td>'+statusPill(o.status)+'</td></tr>'));
+    });
+    tableWrap.appendChild(table);
+    sideCard.appendChild(tableWrap);
+
+    wrap.appendChild(formCard);
+    wrap.appendChild(sideCard);
+    return wrap;
+  }
+
+  function statusPill(status){
+    var map={ '대기':'warning', '승인':'success', '반려':'danger', '회수':'neutral', 'PENDING':'warning', 'APPROVED':'success', 'REJECTED':'danger', 'RECALLED':'neutral' };
+    var labelMap={ 'PENDING':'대기', 'APPROVED':'승인', 'REJECTED':'반려', 'RECALLED':'회수' };
+    var cls = map[status] || 'neutral';
+    var label = labelMap[status] || status;
+    return '<span class="pill '+cls+'">'+label+'</span>';
+  }
+
+  /* ============ Daily report screen ============ */
+  function renderDailyScreen(){
+    var wrap=el('<div class="grid-2"></div>');
+
+    var rawToday = dailyReports[TODAY];
+    var already = (rawToday && rawToday.status!=='회수') ? rawToday : null;
+    var editing = already && already.status==='대기' && state.editingDaily;
+    var yestKey=prevBusinessDayKey(TODAY);
+    var draftSource = dailyReports[yestKey] ? dailyReports[yestKey].plan : '';
+    var myYesterdayLeave = myLeaveOnDate(yestKey);
+
+    var formCard=el('<div class="card card-pad"><div class="card-head"><h2>'+(editing?'일일업무보고 수정':'오늘의 업무보고')+'</h2><span class="hint">'+TODAY_LABEL+'</span></div></div>');
+
+    if(myYesterdayLeave){
+      var ymd=yestKey.slice(5).replace('-','/');
+      formCard.appendChild(el('<div class="badge-auto" style="margin-bottom:14px;">'+ICON.calendar+' 전일('+ymd+')은 '+myYesterdayLeave.type+' 휴가였습니다</div>'));
+    }
+
+    if(already && already.status==='대기' && !editing){
+      // ---- 대기중: 수정/취소 가능 ----
+      var pendBox=el('<div class="card" style="background:var(--surface-alt);padding:14px 16px;"></div>');
+      pendBox.appendChild(el('<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;"><b style="font-size:13px;">상신 완료</b>'+statusPill(already.status)+'</div>'));
+      pendBox.appendChild(el(fieldReadonly('당일 업무실적', already.result)));
+      formCard.appendChild(pendBox);
+
+      var pendBtnRow=el('<div class="btn-row" style="margin-top:14px;"></div>');
+      var editBtn=el('<button class="btn" type="button">수정</button>');
+      editBtn.addEventListener('click', function(){
+        var live=dailyReports[TODAY];
+        if(!live || live.status!=='대기'){ toast('이미 처리되어 수정할 수 없습니다.'); render(); return; }
+        state.editingDaily=true; state.editingDailyVersion=live.version; render();
+      });
+      var cancelBtn=el('<button class="btn danger-o" type="button">취소</button>');
+      cancelBtn.addEventListener('click', function(){
+        var live=dailyReports[TODAY];
+        if(!live || live.status!=='대기'){ toast('이미 처리되어 취소할 수 없습니다.'); render(); return; }
+        if(!confirm('오늘 일일업무보고 상신을 취소하시겠습니까?')) return;
+        live.status='회수'; live.version+=1;
+        toast('상신이 취소되었습니다. 다시 작성할 수 있습니다.');
+        render();
+      });
+      var demoBtn=el('<button class="btn ghost" type="button" style="color:var(--text-faint);font-size:12px;" title="결재자가 지금 막 처리했다고 가정(무결성 가드 데모)">⚡데모: 결재자 승인 시뮬레이션</button>');
+      demoBtn.addEventListener('click', function(){
+        dailyReports[TODAY].status='승인'; dailyReports[TODAY].version+=1;
+        pushNotification('APPROVAL_RESULT', '일일업무보고 승인', TODAY+' 일일업무보고가 승인되었습니다.', {
+          createdAt:TODAY, action:function(){ state.screen='daily'; state.detailReport={kind:'DAILY', key:TODAY}; }
+        });
+        toast('데모: 결재자가 방금 승인 처리했습니다 (화면은 아직 갱신 전 — 위 "수정"을 눌러보세요).');
+      });
+      pendBtnRow.appendChild(demoBtn); pendBtnRow.appendChild(editBtn); pendBtnRow.appendChild(cancelBtn);
+      formCard.appendChild(pendBtnRow);
+    } else if(already && already.status!=='대기'){
+      formCard.appendChild(el('<div class="empty">오늘 일일업무보고를 이미 상신했습니다. '+statusPill(already.status)+'</div>'));
+    } else {
+      var form=el('<form class="stack" style="gap:16px;"></form>');
+      var editSource = editing ? dailyReports[TODAY] : null;
+
+      var resultField=el('<div class="field"></div>');
+      var resultLabelRow=el('<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><label style="margin:0;" for="dr-result">당일 업무실적</label></div>');
+      if(!editing && draftSource){
+        resultLabelRow.appendChild(el('<span class="badge-auto">'+ICON.check+' 전일 계획에서 자동 반영</span>'));
+      }
+      resultField.appendChild(resultLabelRow);
+      resultField.appendChild(el('<textarea class="input" id="dr-result" rows="4">'+escapeHtml(editing?editSource.result:draftSource)+'</textarea>'));
+      resultField.appendChild(el('<div class="helptext">전일('+yestKey.slice(5).replace('-','/')+') 일일업무보고의 "다음날 업무계획"이 자동으로 채워졌습니다. 실제 수행 내용과 다르면 자유롭게 수정하세요.</div>'));
+      form.appendChild(resultField);
+
+      var planField=el('<div class="field"><label for="dr-plan">다음날 업무계획</label><textarea class="input" id="dr-plan" rows="3" placeholder="내일 예정된 업무를 입력하세요">'+escapeHtml(editing?editSource.plan:'')+'</textarea></div>');
+      form.appendChild(planField);
+
+      var notesField=el('<div class="field"><label for="dr-notes">보고사항 <span style="font-weight:400;color:var(--text-faint);">(선택)</span></label><textarea class="input" id="dr-notes" rows="2" placeholder="공유가 필요한 특이사항이 있다면 입력하세요">'+escapeHtml(editing?editSource.notes:'')+'</textarea></div>');
+      form.appendChild(notesField);
+
+      var btnRow=el('<div class="btn-row"></div>');
+      if(editing){
+        var cancelEditBtn=el('<button class="btn ghost" type="button">수정 취소</button>');
+        cancelEditBtn.addEventListener('click', function(){ state.editingDaily=false; render(); });
+        btnRow.appendChild(cancelEditBtn);
+      }
+      btnRow.appendChild(el('<button class="btn primary" type="submit">'+(editing?'수정 저장':'결재 상신')+'</button>'));
+      form.appendChild(btnRow);
+
+      form.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var result=form.querySelector('#dr-result').value.trim();
+        var plan=form.querySelector('#dr-plan').value.trim();
+        if(!result || !plan){ toast('당일 업무실적과 다음날 업무계획은 필수입니다.'); return; }
+        if(editing){
+          var live=dailyReports[TODAY];
+          if(!live || live.status!=='대기' || live.version!==state.editingDailyVersion){
+            toast('이미 처리되어 수정할 수 없습니다. 최신 상태로 갱신합니다.');
+            state.editingDaily=false; render();
+            return;
+          }
+          live.result=result; live.plan=plan; live.notes=form.querySelector('#dr-notes').value.trim();
+          live.version+=1; live.editedAt=TODAY;
+          state.editingDaily=false;
+          toast('일일업무보고가 수정되었습니다.');
+          render();
+          return;
+        }
+        dailyReports[TODAY] = { result:result, plan:plan, notes:form.querySelector('#dr-notes').value.trim(), status:'대기', version:1, editedAt:null };
+        toast('일일업무보고가 상신되었습니다.');
+        render();
+      });
+
+      formCard.appendChild(form);
+    }
+
+    var sideCard=el('<div class="card card-pad"><div class="card-head"><h2>최근 작성 이력</h2></div></div>');
+    var keys=Object.keys(dailyReports).sort().reverse();
+    if(keys.length===0){ sideCard.appendChild(el('<div class="empty">작성 이력이 없습니다.</div>')); }
+    keys.forEach(function(k){
+      var r=dailyReports[k];
+      var editedTag = r.editedAt ? ' <span class="pill neutral" style="padding:1px 7px;">수정됨</span>' : '';
+      var row=el('<div class="list-row"><div style="flex:1;min-width:0;"><div style="font-weight:600;">'+k+editedTag+'</div><div style="font-size:12.5px;color:var(--text-faint);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHtml(r.result)+'</div></div>'+statusPill(r.status)+'<button class="btn ghost" type="button" style="flex:none;">보기</button></div>');
+      row.querySelector('button').addEventListener('click', function(){ openReportDetail('DAILY', k); });
+      sideCard.appendChild(row);
+    });
+
+    wrap.appendChild(formCard);
+    wrap.appendChild(sideCard);
+    return wrap;
+  }
+
+  /* ============ Weekly report screen ============ */
+  function renderWeeklyScreen(){
+    var wrap=el('<div class="grid-2"></div>');
+    var weekStart='2026-08-10';
+    var already = weeklyReports[weekStart];
+
+    var formCard=el('<div class="card card-pad"><div class="card-head"><h2>이번 주 업무보고</h2><span class="hint">'+weekRangeLabel(weekStart)+'</span></div></div>');
+
+    var weekEndKey='2026-08-14';
+    var teamLeaves = teamLeavesInRange(ME.dept, weekStart, weekEndKey);
+    if(teamLeaves.length>0){
+      var names = teamLeaves.map(function(l){ return l.name+'('+l.start.slice(5).replace('-','/')+')'; }).join(', ');
+      formCard.appendChild(el('<div class="badge-auto" style="margin-bottom:14px;">'+ICON.calendar+' 이번 주 팀원 '+teamLeaves.length+'명 휴가 — '+names+'</div>'));
+    }
+
+    if(already){
+      formCard.appendChild(el('<div class="empty">이번 주 주간업무보고를 이미 상신했습니다. '+statusPill(already.status)+'</div>'));
+    } else {
+      var aggLines = aggregateWeek(weekStart);
+      var draft = aggLines.join('\n');
+
+      var form=el('<form class="stack" style="gap:16px;"></form>');
+
+      var resultField=el('<div class="field"></div>');
+      var labelRow=el('<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><label style="margin:0;" for="wr-result">금주 업무실적</label></div>');
+      if(aggLines.length>0){
+        labelRow.appendChild(el('<span class="badge-auto">'+ICON.check+' 일일보고 '+aggLines.length+'건 자동 취합</span>'));
+      }
+      resultField.appendChild(labelRow);
+      resultField.appendChild(el('<textarea class="input" id="wr-result" rows="6">'+draft+'</textarea>'));
+      resultField.appendChild(el('<div class="helptext">이번 주에 작성된 일일업무보고의 "당일 업무실적"을 날짜순으로 모아 초안을 만들었습니다. 아직 작성되지 않은 날(08/13 등)은 제외되며, 요약·정리 후 상신하세요.</div>'));
+      form.appendChild(resultField);
+
+      var planField=el('<div class="field"><label for="wr-plan">차주 업무계획</label><textarea class="input" id="wr-plan" rows="3" placeholder="다음 주 예정 업무를 입력하세요"></textarea></div>');
+      form.appendChild(planField);
+
+      var notesField=el('<div class="field"><label for="wr-notes">보고사항 <span style="font-weight:400;color:var(--text-faint);">(선택)</span></label><textarea class="input" id="wr-notes" rows="2" placeholder="공유가 필요한 특이사항이 있다면 입력하세요"></textarea></div>');
+      form.appendChild(notesField);
+
+      form.appendChild(el('<div class="btn-row"><button class="btn primary" type="submit">결재 상신</button></div>'));
+
+      form.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var result=form.querySelector('#wr-result').value.trim();
+        var plan=form.querySelector('#wr-plan').value.trim();
+        if(!result || !plan){ toast('금주 업무실적과 차주 업무계획은 필수입니다.'); return; }
+        weeklyReports[weekStart] = { result:result, plan:plan, notes:form.querySelector('#wr-notes').value.trim(), status:'대기' };
+        toast('주간업무보고가 상신되었습니다.');
+        render();
+      });
+
+      formCard.appendChild(form);
+    }
+
+    var sideCard=el('<div class="card card-pad"></div>');
+
+    sideCard.appendChild(el('<div class="card-head"><h2>이번 주 일일보고 현황</h2></div>'));
+    var days=['2026-08-10','2026-08-11','2026-08-12','2026-08-13','2026-08-14'];
+    var labels=['월 08/10','화 08/11','수 08/12','목 08/13','금 08/14'];
+    days.forEach(function(k,i){
+      var r=dailyReports[k];
+      sideCard.appendChild(el('<div class="list-row"><div style="flex:1;font-weight:600;">'+labels[i]+'</div>'+(r?statusPill(r.status):'<span class="pill neutral">미작성</span>')+'</div>'));
+    });
+
+    sideCard.appendChild(el('<hr class="divider" style="margin:18px 0;" />'));
+
+    sideCard.appendChild(el('<div class="card-head"><h2>작성 이력</h2></div>'));
+    var wKeys=Object.keys(weeklyReports).sort().reverse();
+    if(wKeys.length===0){ sideCard.appendChild(el('<div class="empty">작성 이력이 없습니다.</div>')); }
+    wKeys.forEach(function(k){
+      var r=weeklyReports[k];
+      var row=el('<div class="list-row"><div style="flex:1;min-width:0;"><div style="font-weight:600;">'+weekRangeLabel(k)+'</div><div style="font-size:12.5px;color:var(--text-faint);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHtml(r.result)+'</div></div>'+statusPill(r.status)+'<button class="btn ghost" type="button" style="flex:none;">보기</button></div>');
+      row.querySelector('button').addEventListener('click', function(){ openReportDetail('WEEKLY', k); });
+      sideCard.appendChild(row);
+    });
+
+    wrap.appendChild(formCard);
+    wrap.appendChild(sideCard);
+    return wrap;
+  }
+
+  /* ============ 출장신청 (관내/시외) ============ */
+  function renderBusinessTripScreen(){
+    var wrap=el('<div class="grid-2"></div>');
+
+    var formCard=el('<div class="card card-pad"><div class="card-head"><h2>출장신청</h2></div></div>');
+    var form=el('<form class="stack" style="gap:16px;"></form>');
+
+    var typeField=el('<div class="field"><label>출장 구분</label></div>');
+    var typeSel=el('<select class="input"><option value="관내">관내출장</option><option value="시외">시외출장</option></select>');
+    typeField.appendChild(typeSel);
+    form.appendChild(typeField);
+
+    // --- 시외출장: 시작일~종료일 ---
+    var dateRow=el('<div class="field-row"></div>');
+    var startField=el('<div class="field"><label>시작일</label></div>');
+    var endField=el('<div class="field"><label>종료일</label></div>');
+    var startDG=makeDateField('2026-08-20', function(){ endDG.setMin(startDG.getValue()); if(endDG.getValue()<startDG.getValue()) endDG.setValue(startDG.getValue()); });
+    var endDG=makeDateField('2026-08-20', function(){});
+    startField.appendChild(startDG.el); endField.appendChild(endDG.el);
+    dateRow.appendChild(startField); dateRow.appendChild(endField);
+    form.appendChild(dateRow);
+
+    // --- 관내출장: 날짜 + 시작시간/종료시간 ---
+    var localRow=el('<div class="field-row" style="display:none;"></div>');
+    var localDateField=el('<div class="field"><label>날짜</label></div>');
+    var localDateDG=makeDateField('2026-08-20', function(){});
+    localDateField.appendChild(localDateDG.el);
+    var localStartField=el('<div class="field"><label>시작시간</label></div>');
+    var localStartSel=el('<select class="input"></select>');
+    var localEndField=el('<div class="field"><label>종료시간</label></div>');
+    var localEndSel=el('<select class="input"></select>');
+    hourOptions().forEach(function(h){
+      localStartSel.appendChild(el('<option value="'+h+'">'+h+'</option>'));
+      localEndSel.appendChild(el('<option value="'+h+'">'+h+'</option>'));
+    });
+    localStartSel.value='10:00'; localEndSel.value='12:00';
+    localStartField.appendChild(localStartSel); localEndField.appendChild(localEndSel);
+    localRow.appendChild(localDateField); localRow.appendChild(localStartField); localRow.appendChild(localEndField);
+    form.appendChild(localRow);
+    var localTimeErr=el('<div class="helptext" style="display:none;color:var(--danger);">종료시간은 시작시간보다 늦어야 합니다.</div>');
+    form.appendChild(localTimeErr);
+
+    var destField=el('<div class="field"><label for="tr-dest">출장지</label><input class="input" id="tr-dest" type="text" placeholder="예: 부산 해운대" /></div>');
+    form.appendChild(destField);
+
+    var transportField=el('<div class="field" style="display:none;"><label for="tr-transport">교통편(예정)</label></div>');
+    var transportSel=el('<select class="input" id="tr-transport"></select>');
+    TRANSPORT_OPTIONS.forEach(function(t){ transportSel.appendChild(el('<option value="'+t+'">'+t+'</option>')); });
+    transportField.appendChild(transportSel);
+    form.appendChild(transportField);
+    var transportHelp=el('<div class="helptext" style="display:none;">시외출장은 완료 후 3일 이내 "출장결과보고" 메뉴에서 출장비 청구와 함께 결과보고서를 작성해야 합니다.</div>');
+    form.appendChild(transportHelp);
+
+    var purposeField=el('<div class="field"><label for="tr-purpose">출장 목적/내용</label><textarea class="input" id="tr-purpose" rows="3" placeholder="예: 거래처 미팅 및 현장 실사"></textarea></div>');
+    form.appendChild(purposeField);
+
+    function syncTripType(){
+      var isOut=typeSel.value==='시외';
+      dateRow.style.display = isOut ? '' : 'none';
+      localRow.style.display = isOut ? 'none' : '';
+      transportField.style.display = isOut ? '' : 'none';
+      transportHelp.style.display = isOut ? '' : 'none';
+    }
+    typeSel.addEventListener('change', syncTripType);
+    syncTripType();
+
+    form.appendChild(el('<div class="btn-row"><button class="btn primary" type="submit">결재 상신</button></div>'));
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var dest=destField.querySelector('input').value.trim();
+      var purpose=purposeField.querySelector('textarea').value.trim();
+      if(!dest || !purpose){ toast('출장지와 출장 목적을 입력하세요.'); return; }
+      var isOut=typeSel.value==='시외';
+      var s,e2,sTime=null,eTime=null;
+      if(isOut){
+        s=startDG.getValue(); e2=endDG.getValue();
+        if(e2<s){ toast('종료일은 시작일 이후여야 합니다.'); return; }
+      } else {
+        s=localDateDG.getValue(); e2=s; sTime=localStartSel.value; eTime=localEndSel.value;
+        if(eTime<=sTime){ localTimeErr.style.display=''; return; }
+        localTimeErr.style.display='none';
+      }
+      businessTrips.unshift({
+        id:nextTripId++, tripType:typeSel.value, startDate:s, endDate:e2, startTime:sTime, endTime:eTime,
+        destination:dest, purpose:purpose, transport: isOut ? transportSel.value : null,
+        status:'대기', approver:'정민아 팀장', version:1, editedAt:null, report:null
+      });
+      toast('출장신청이 상신되었습니다.');
+      render();
+    });
+    formCard.appendChild(form);
+
+    var sideCard=el('<div class="card card-pad"><div class="card-head"><h2>신청 내역</h2></div></div>');
+    var tableWrap=el('<div class="table-wrap"></div>');
+    var table=el('<table><thead><tr><th>구분</th><th>기간</th><th>출장지</th><th>상태</th><th></th></tr></thead><tbody></tbody></table>');
+    var tbody=table.querySelector('tbody');
+    if(businessTrips.length===0){
+      tbody.appendChild(el('<tr><td colspan="5"><div class="empty">신청 내역이 없습니다.</div></td></tr>'));
+    }
+    businessTrips.forEach(function(t){
+      var periodText = t.tripType==='관내' ? (t.startDate+' '+t.startTime+'~'+t.endTime) : (t.startDate+' ~ '+t.endDate);
+      var tr=el('<tr><td><span class="pill neutral">'+t.tripType+'</span></td><td class="num">'+periodText+'</td><td>'+escapeHtml(t.destination)+'</td><td>'+statusPill(t.status)+'</td><td style="text-align:right;"></td></tr>');
+      if(t.status==='대기'){
+        var cancelBtn=el('<button class="btn ghost" type="button" style="padding:4px 8px;font-size:12px;color:var(--danger);">취소</button>');
+        cancelBtn.addEventListener('click', function(){
+          if(t.status!=='대기'){ toast('이미 처리되어 취소할 수 없습니다.'); render(); return; }
+          if(!confirm('이 출장신청을 취소하시겠습니까?')) return;
+          t.status='회수'; t.version+=1;
+          toast('출장신청이 취소되었습니다.');
+          render();
+        });
+        tr.lastElementChild.appendChild(cancelBtn);
+      }
+      tbody.appendChild(tr);
+    });
+    tableWrap.appendChild(table);
+    sideCard.appendChild(tableWrap);
+
+    wrap.appendChild(formCard);
+    wrap.appendChild(sideCard);
+    return wrap;
+  }
+
+  /* ============ 출장결과보고 (시외출장 완료 건 대상) ============ */
+  function eligibleTripsForReport(){
+    return businessTrips.filter(function(t){ return t.tripType==='시외' && t.status==='승인' && t.endDate<=TODAY; });
+  }
+
+  /* ============ 알림 초기 데이터 구성 ============
+     1) 결재 요청 도착(승인자에게) 2) 결재 처리 결과(신청자에게) 3) 공지사항 등록 4) 기한 임박/초과 */
+  function seedNotifications(){
+    approvalQueue.filter(function(a){ return a.status==='PENDING'; })
+      .slice().sort(function(a,b){ return a.submittedAt<b.submittedAt?1:-1; })
+      .forEach(function(a){
+        pushNotification('APPROVAL_REQUEST', TYPE_LABEL[a.type]+' 결재 요청', a.requester+' · '+a.dept+' — '+a.summary, {
+          createdAt:a.submittedAt,
+          action:function(){ state.screen='approvals'; state.detailApprovalId=a.id; }
+        });
+      });
+
+    pushNotification('APPROVAL_RESULT', '일일업무보고 승인', '08/11 일일업무보고가 승인되었습니다.', {
+      createdAt:'2026-08-11',
+      action:function(){ state.screen='daily'; state.detailReport={kind:'DAILY', key:'2026-08-11'}; }
+    });
+    pushNotification('APPROVAL_RESULT', '병가 승인', '2026-08-06 병가 신청이 승인되었습니다.', {
+      createdAt:'2026-08-06',
+      action:function(){ state.screen='leave'; }
+    });
+    pushNotification('APPROVAL_RESULT', '초과근무 승인', '08/13 초과근무 신청이 승인되었습니다.', {
+      createdAt:'2026-08-13',
+      action:function(){ state.screen='overtime'; }
+    });
+
+    var latestNotice = BOARD_POSTS.filter(function(p){ return p.isNotice; }).sort(function(a,b){ return a.createdAt<b.createdAt?1:-1; })[0];
+    if(latestNotice){
+      pushNotification('NOTICE', '새 공지사항', latestNotice.title, {
+        createdAt:latestNotice.createdAt,
+        action:function(){ state.screen='board'; state.boardMode='view'; state.boardSelectedId=latestNotice.id; }
+      });
+    }
+
+    businessTrips.filter(function(t){ return t.tripType==='시외' && t.status==='승인' && t.endDate<=TODAY && !t.report; })
+      .forEach(function(t){
+        var due=tripReportDueInfo(t);
+        if(due.overdue || due.daysLeft<=1){
+          pushNotification('DEADLINE',
+            due.overdue ? '출장결과보고 기한 초과' : '출장결과보고 기한 임박',
+            t.destination+' 출장결과보고 제출기한 '+due.dueKey+(due.overdue?' (기한 초과)':' (D-'+due.daysLeft+')'),
+            { createdAt:TODAY, action:function(){ state.screen='trip-report'; state.tripReportSelectedId=t.id; } }
+          );
+        }
+      });
+
+    notifications.sort(function(a,b){ return a.createdAt<b.createdAt?1:(a.createdAt>b.createdAt?-1:0); });
+  }
+
+  function renderTripReportScreen(){
+    var wrap=el('<div class="grid-2"></div>');
+    var trips=eligibleTripsForReport().slice().sort(function(a,b){ return a.endDate<b.endDate?1:-1; });
+
+    var listCard=el('<div class="card card-pad"></div>');
+    listCard.appendChild(el('<div class="card-head"><h2>출장 목록</h2><span class="hint">완료된 시외출장</span></div>'));
+    if(trips.length===0){ listCard.appendChild(el('<div class="empty">결과보고 대상 출장이 없습니다.</div>')); }
+    var selectedId = state.tripReportSelectedId || (trips[0] && trips[0].id);
+    trips.forEach(function(t){
+      var due=tripReportDueInfo(t);
+      var statusTag;
+      if(t.report){
+        statusTag = statusPill(t.report.status);
+      } else if(due.overdue){
+        statusTag='<span class="pill danger">기한초과</span>';
+      } else {
+        statusTag='<span class="pill warning">미작성 (D-'+due.daysLeft+')</span>';
+      }
+      var isActive=t.id===selectedId;
+      var row=el('<div class="list-row" style="cursor:pointer;align-items:flex-start;'+(isActive?'background:var(--accent-soft);border-radius:var(--r-sm);padding-left:8px;padding-right:8px;':'')+'"><div style="flex:1;min-width:0;"><div style="font-weight:600;">'+escapeHtml(t.destination)+'</div><div style="font-size:12px;color:var(--text-faint);margin-top:3px;">'+t.startDate+' ~ '+t.endDate+'</div></div></div>');
+      row.appendChild(el(statusTag));
+      row.addEventListener('click', function(){ state.tripReportSelectedId=t.id; render(); });
+      listCard.appendChild(row);
+    });
+
+    var rightCard=el('<div class="card card-pad"></div>');
+    var selected=trips.find(function(t){return t.id===selectedId;});
+    if(!selected){
+      rightCard.appendChild(el('<div class="empty">좌측 목록에서 출장 건을 선택하세요.</div>'));
+    } else if(selected.report){
+      var r=selected.report;
+      var total=r.transportCost+r.lodgingCost+r.dailyAllowance+r.mealAllowance;
+      rightCard.appendChild(el('<div class="card-head"><h2>'+escapeHtml(selected.destination)+' 결과보고</h2>'+statusPill(r.status)+'</div>'));
+      rightCard.appendChild(el('<div class="kv-row"><span class="k">출장 기간</span><span class="v num">'+selected.startDate+' ~ '+selected.endDate+'</span></div>'));
+      rightCard.appendChild(el('<div class="kv-row" style="margin-top:8px;"><span class="k">교통편</span><span class="v">'+escapeHtml(r.transport||'-')+'</span></div>'));
+      rightCard.appendChild(el('<div class="kv-row" style="margin-top:8px;"><span class="k">교통비</span><span class="v num">'+r.transportCost.toLocaleString()+'원</span></div>'));
+      rightCard.appendChild(el('<div class="kv-row" style="margin-top:8px;"><span class="k">숙박비</span><span class="v num">'+(r.hasLodging?(r.lodgingCost.toLocaleString()+'원'):'해당없음')+'</span></div>'));
+      rightCard.appendChild(el('<div class="kv-row" style="margin-top:8px;"><span class="k">일비</span><span class="v num">'+r.dailyAllowance.toLocaleString()+'원</span></div>'));
+      rightCard.appendChild(el('<div class="kv-row" style="margin-top:8px;"><span class="k">식비</span><span class="v num">'+r.mealAllowance.toLocaleString()+'원</span></div>'));
+      rightCard.appendChild(el('<div class="kv-row" style="margin-top:8px;"><span class="k">합계 청구액</span><span class="v num" style="color:var(--accent-strong);">'+total.toLocaleString()+'원</span></div>'));
+      rightCard.appendChild(el('<hr class="divider" style="margin:14px 0;" />'));
+      rightCard.appendChild(el(fieldReadonly('출장업무 처리내용', r.workContent)));
+      if(r.transportAttachmentName){
+        rightCard.appendChild(el('<div class="helptext" style="margin-top:12px;">교통비 증빙</div>'));
+        rightCard.appendChild(el('<div class="upload-box filled">'+ICON.clip+'<span>'+escapeHtml(r.transportAttachmentName)+'</span></div>'));
+      }
+      if(r.hasLodging && r.lodgingAttachmentName){
+        rightCard.appendChild(el('<div class="helptext" style="margin-top:10px;">숙박비 증빙</div>'));
+        rightCard.appendChild(el('<div class="upload-box filled">'+ICON.clip+'<span>'+escapeHtml(r.lodgingAttachmentName)+'</span></div>'));
+      }
+    } else {
+      var due=tripReportDueInfo(selected);
+      var tripDays=calendarDaysBetween(selected.startDate, selected.endDate);
+      rightCard.appendChild(el('<div class="card-head"><h2>출장결과보고 작성</h2><span class="hint">'+selected.destination+' · '+tripDays+'일</span></div>'));
+      var dueText = due.overdue
+        ? '제출 기한('+due.dueKey+')이 지났습니다'
+        : '제출 기한 '+due.dueKey+' 까지 (D-'+due.daysLeft+')';
+      rightCard.appendChild(el('<div class="'+(due.overdue?'pill danger':'badge-auto')+'" style="margin-bottom:14px;">'+dueText+'</div>'));
+
+      var form=el('<form class="stack" style="gap:16px;"></form>');
+      form.appendChild(el('<div class="field"><label for="tr-work">출장업무 처리내용</label><textarea class="input" id="tr-work" rows="4" placeholder="출장에서 수행한 업무와 결과를 입력하세요"></textarea></div>'));
+
+      // ---- 교통비: 교통편 + 금액 + 증빙 ----
+      form.appendChild(el('<div style="font-size:13px;font-weight:700;color:var(--text-muted);">교통비</div>'));
+      var transRow=el('<div class="field-row"></div>');
+      var transTypeField=el('<div class="field"><label for="tr-transport-type">교통편</label></div>');
+      var transTypeSel=el('<select class="input" id="tr-transport-type"></select>');
+      TRANSPORT_OPTIONS.forEach(function(t){ transTypeSel.appendChild(el('<option value="'+t+'">'+t+'</option>')); });
+      if(selected.transport) transTypeSel.value=selected.transport;
+      transTypeField.appendChild(transTypeSel);
+      var transCostField=el('<div class="field"><label for="tr-transport-cost">교통비(원)</label><input class="input" id="tr-transport-cost" type="text" placeholder="0" /></div>');
+      transRow.appendChild(transTypeField); transRow.appendChild(transCostField);
+      form.appendChild(transRow);
+      var transportCostVal=0;
+      attachMoneyFormat(transCostField.querySelector('input'), function(v){ transportCostVal=v; updateTotal(); });
+
+      var transFileField=el('<div class="field"><label>교통비 증빙자료</label>'+
+        '<div class="upload-box" id="tr-trans-upload">'+ICON.upload+'<span id="tr-trans-upload-text">영수증 등 증빙파일을 첨부하세요</span></div>'+
+        '<input type="file" id="tr-trans-file" style="display:none;" />'+
+      '</div>');
+      form.appendChild(transFileField);
+      var transFileInput=transFileField.querySelector('#tr-trans-file');
+      var transUploadBox=transFileField.querySelector('#tr-trans-upload');
+      transUploadBox.addEventListener('click', function(){ transFileInput.click(); });
+      transFileInput.addEventListener('change', function(){
+        var has=transFileInput.files.length>0;
+        transUploadBox.classList.toggle('filled', has);
+        transFileField.querySelector('#tr-trans-upload-text').textContent = has ? transFileInput.files[0].name : '영수증 등 증빙파일을 첨부하세요';
+      });
+
+      // ---- 숙박비: 숙박 여부 토글 + 금액 + 증빙(조건부) ----
+      form.appendChild(el('<hr class="divider" />'));
+      var lodgingCb=el('<label class="checkbox-row"><input type="checkbox" id="tr-has-lodging" /><span>숙박 있음</span></label>');
+      form.appendChild(lodgingCb);
+      var lodgingCostField=el('<div class="field" style="display:none;"><label for="tr-lodging-cost">숙박비(원)</label><input class="input" id="tr-lodging-cost" type="text" placeholder="0" /></div>');
+      form.appendChild(lodgingCostField);
+      var lodgingFileField=el('<div class="field" style="display:none;"><label>숙박비 증빙자료</label>'+
+        '<div class="upload-box" id="tr-lodge-upload">'+ICON.upload+'<span id="tr-lodge-upload-text">영수증 등 증빙파일을 첨부하세요</span></div>'+
+        '<input type="file" id="tr-lodge-file" style="display:none;" />'+
+      '</div>');
+      form.appendChild(lodgingFileField);
+      var lodgingCostVal=0;
+      attachMoneyFormat(lodgingCostField.querySelector('input'), function(v){ lodgingCostVal=v; updateTotal(); });
+      var lodgeFileInput=lodgingFileField.querySelector('#tr-lodge-file');
+      var lodgeUploadBox=lodgingFileField.querySelector('#tr-lodge-upload');
+      lodgeUploadBox.addEventListener('click', function(){ lodgeFileInput.click(); });
+      lodgeFileInput.addEventListener('change', function(){
+        var has=lodgeFileInput.files.length>0;
+        lodgeUploadBox.classList.toggle('filled', has);
+        lodgingFileField.querySelector('#tr-lodge-upload-text').textContent = has ? lodgeFileInput.files[0].name : '영수증 등 증빙파일을 첨부하세요';
+      });
+      var lodgingCbInput=lodgingCb.querySelector('input');
+      lodgingCbInput.addEventListener('change', function(){
+        var on=lodgingCbInput.checked;
+        lodgingCostField.style.display = on ? '' : 'none';
+        lodgingFileField.style.display = on ? '' : 'none';
+        if(!on){ lodgingCostVal=0; lodgingCostField.querySelector('input').value=''; }
+        updateTotal();
+      });
+
+      // ---- 일비/식비: 회사 단가 × 출장일수 자동 계산 ----
+      form.appendChild(el('<hr class="divider" />'));
+      var autoDaily=COMPANY.dailyAllowanceRate*tripDays;
+      var autoMeal=COMPANY.mealAllowanceRate*tripDays;
+      var autoRow=el('<div class="card" style="background:var(--surface-alt);"><div style="padding:12px 16px;" class="kv"></div></div>');
+      var autoKv=autoRow.querySelector('.kv');
+      autoKv.appendChild(el('<div class="kv-row"><span class="k">일비 ('+COMPANY.dailyAllowanceRate.toLocaleString()+'원 × '+tripDays+'일)</span><span class="v num">'+autoDaily.toLocaleString()+'원</span></div>'));
+      autoKv.appendChild(el('<div class="kv-row" style="margin-top:6px;"><span class="k">식비 ('+COMPANY.mealAllowanceRate.toLocaleString()+'원 × '+tripDays+'일)</span><span class="v num">'+autoMeal.toLocaleString()+'원</span></div>'));
+      form.appendChild(autoRow);
+
+      var totalRow=el('<div class="card" style="background:var(--surface-alt);border:1px dashed var(--border-strong);"><div style="padding:12px 16px;" class="kv-row"><span class="k">합계 청구액</span><span class="v num" id="tr-total">0원</span></div></div>');
+      form.appendChild(totalRow);
+      function updateTotal(){
+        var sum=transportCostVal+lodgingCostVal+autoDaily+autoMeal;
+        totalRow.querySelector('#tr-total').textContent = sum.toLocaleString()+'원';
+      }
+
+      form.appendChild(el('<div class="btn-row"><button class="btn primary" type="submit">결재 상신</button></div>'));
+      form.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var workContent=form.querySelector('#tr-work').value.trim();
+        if(!workContent){ toast('출장업무 처리내용을 입력하세요.'); return; }
+        selected.report={
+          workContent:workContent, transport:transTypeSel.value, transportCost:transportCostVal,
+          transportAttachmentName: transFileInput.files.length>0 ? transFileInput.files[0].name : null,
+          hasLodging: lodgingCbInput.checked, lodgingCost: lodgingCbInput.checked ? lodgingCostVal : 0,
+          lodgingAttachmentName: (lodgingCbInput.checked && lodgeFileInput.files.length>0) ? lodgeFileInput.files[0].name : null,
+          dailyAllowance:autoDaily, mealAllowance:autoMeal,
+          status:'대기', submittedAt:TODAY, version:1, editedAt:null
+        };
+        toast('출장결과보고 및 출장비 청구가 상신되었습니다.');
+        render();
+      });
+      updateTotal();
+      rightCard.appendChild(form);
+    }
+
+    wrap.appendChild(listCard);
+    wrap.appendChild(rightCard);
+    return wrap;
+  }
+
+  /* ============ Calendar screen ============ */
+  var CAL_YEAR=2026, CAL_MONTH=8; // 목업 고정 월(2026년 8월)
+  var WEEKDAY_LABELS=['월','화','수','목','금','토','일'];
+
+  function buildMonthGrid(year, month){
+    var first=new Date(year, month-1, 1);
+    var offset=(first.getDay()+6)%7; // 월요일 시작 기준 오프셋
+    var start=new Date(year, month-1, 1-offset);
+    var cells=[];
+    for(var i=0;i<42;i++){
+      var d=new Date(start); d.setDate(start.getDate()+i);
+      cells.push(d);
+    }
+    return cells;
+  }
+
+  function renderCalendarScreen(){
+    var wrap=el('<div class="stack"></div>');
+    var card=el('<div class="card card-pad"></div>');
+
+    var toolbar=el('<div class="cal-toolbar"></div>');
+    var monthNav=el('<div style="display:flex;align-items:center;gap:10px;">'+
+      '<button class="btn ghost" type="button" style="padding:6px 10px;">‹</button>'+
+      '<h2 style="font-size:16px;min-width:104px;text-align:center;">'+CAL_YEAR+'년 '+CAL_MONTH+'월</h2>'+
+      '<button class="btn ghost" type="button" style="padding:6px 10px;">›</button>'+
+    '</div>');
+    Array.prototype.forEach.call(monthNav.querySelectorAll('button'), function(b){
+      b.addEventListener('click', function(){ toast('목업에서는 2026년 8월 캘린더만 제공됩니다.'); });
+    });
+    toolbar.appendChild(monthNav);
+
+    var right=el('<div style="display:flex;align-items:center;gap:12px;"></div>');
+    var deptSel=el('<select class="input" style="width:150px;padding:7px 10px;"></select>');
+    deptSel.appendChild(el('<option value="ALL">전체 부서</option>'));
+    DEPARTMENTS.forEach(function(d){ deptSel.appendChild(el('<option value="'+d.name+'">'+d.name+'</option>')); });
+    deptSel.value=state.calendarDeptFilter;
+    deptSel.addEventListener('change', function(){ state.calendarDeptFilter=deptSel.value; render(); });
+    right.appendChild(deptSel);
+    var addBtn=el('<button class="btn primary" type="button">'+ICON.plus+' 일정 등록</button>');
+    addBtn.addEventListener('click', function(){ state.showEventForm=true; render(); });
+    right.appendChild(addBtn);
+    toolbar.appendChild(right);
+    card.appendChild(toolbar);
+
+    var legend=el('<div class="cal-legend" style="margin-bottom:12px;">'+
+      '<span><span class="cal-legend-dot" style="background:var(--success);"></span>승인된 휴가</span>'+
+      '<span><span class="cal-legend-dot" style="background:var(--accent);"></span>사내 일정</span>'+
+    '</div>');
+    card.appendChild(legend);
+
+    var weekhead=el('<div class="cal-weekhead"></div>');
+    WEEKDAY_LABELS.forEach(function(w){ weekhead.appendChild(el('<div>'+w+'</div>')); });
+    card.appendChild(weekhead);
+
+    var grid=el('<div class="cal-grid"></div>');
+    var cells=buildMonthGrid(CAL_YEAR, CAL_MONTH);
+    cells.forEach(function(d){
+      var key=toLocalKey(d);
+      var isOut = d.getMonth()!==(CAL_MONTH-1);
+      var isToday = key===TODAY;
+      var cell=el('<div class="cal-cell'+(isOut?' out':'')+(isToday?' today':'')+'"></div>');
+      cell.appendChild(el('<div class="cal-daynum">'+d.getDate()+'</div>'));
+
+      var leaves=leavesOnDate(key, state.calendarDeptFilter);
+      var events=eventsOnDate(key, state.calendarDeptFilter);
+      var items=[];
+      leaves.forEach(function(l){ items.push({cls:'leave', label:l.name+' '+l.type}); });
+      events.forEach(function(e){ items.push({cls:'event', label:e.title}); });
+
+      items.slice(0,3).forEach(function(it){
+        var chip=el('<button type="button" class="cal-chip '+it.cls+'">'+escapeHtml(it.label)+'</button>');
+        chip.addEventListener('click', function(){ state.dayDetailKey=key; render(); });
+        cell.appendChild(chip);
+      });
+      if(items.length>3){
+        var more=el('<button type="button" class="cal-more">+'+(items.length-3)+'건 더보기</button>');
+        more.addEventListener('click', function(){ state.dayDetailKey=key; render(); });
+        cell.appendChild(more);
+      }
+      grid.appendChild(cell);
+    });
+    card.appendChild(grid);
+
+    wrap.appendChild(card);
+    return wrap;
+  }
+
+  function openDayDetail(key){ state.dayDetailKey=key; render(); }
+  function closeDayDetail(){ state.dayDetailKey=null; render(); }
+
+  function renderDayDetailPanel(){
+    var key=state.dayDetailKey;
+    var d=new Date(key+'T00:00:00');
+    var label=(d.getMonth()+1)+'월 '+d.getDate()+'일 ('+WEEKDAY_LABELS[(d.getDay()+6)%7]+')';
+
+    var overlay=el('<div class="overlay"></div>');
+    overlay.addEventListener('click', function(e){ if(e.target===overlay) closeDayDetail(); });
+    var panel=el('<div class="panel"></div>');
+
+    var head=el('<div class="panel-head"><h2 style="font-size:17px;">'+label+'</h2></div>');
+    var closeBtn=el('<button class="icon-btn" type="button">'+ICON.close+'</button>');
+    closeBtn.addEventListener('click', closeDayDetail);
+    head.appendChild(closeBtn);
+    panel.appendChild(head);
+
+    var leaves=leavesOnDate(key, state.calendarDeptFilter);
+    var events=eventsOnDate(key, state.calendarDeptFilter);
+
+    panel.appendChild(el('<div class="card-head" style="margin-bottom:8px;"><h2 style="font-size:13px;color:var(--text-faint);">승인된 휴가 ('+leaves.length+')</h2></div>'));
+    if(leaves.length===0){ panel.appendChild(el('<div class="empty" style="padding:14px 0;">해당 날짜에 휴가자가 없습니다.</div>')); }
+    leaves.forEach(function(l){
+      panel.appendChild(el('<div class="list-row"><span class="pill success">'+l.type+'</span><div style="flex:1;">'+l.name+' · '+l.dept+'</div></div>'));
+    });
+
+    panel.appendChild(el('<hr class="divider" />'));
+
+    panel.appendChild(el('<div class="card-head" style="margin-bottom:8px;"><h2 style="font-size:13px;color:var(--text-faint);">사내 일정 ('+events.length+')</h2></div>'));
+    if(events.length===0){ panel.appendChild(el('<div class="empty" style="padding:14px 0;">등록된 일정이 없습니다.</div>')); }
+    events.forEach(function(e){
+      var row=el('<div class="list-row" style="align-items:flex-start;"><span class="pill neutral">'+(e.startTime||'')+'</span><div style="flex:1;"><div style="font-weight:600;">'+escapeHtml(e.title)+'</div><div style="font-size:12px;color:var(--text-faint);margin-top:2px;">'+(e.location?escapeHtml(e.location)+' · ':'')+(e.dept||'전사')+' · '+e.createdBy+'</div></div></div>');
+      if(e.createdBy===ME.name){
+        var delBtn=el('<button class="btn ghost" type="button" style="flex:none;color:var(--danger);">'+ICON.trash+'</button>');
+        delBtn.addEventListener('click', function(){
+          EVENTS.splice(EVENTS.indexOf(e),1);
+          toast('일정이 삭제되었습니다.');
+          render();
+        });
+        row.appendChild(delBtn);
+      }
+      panel.appendChild(row);
+    });
+
+    overlay.appendChild(panel);
+    return overlay;
+  }
+
+  function renderEventFormModal(){
+    var overlay=el('<div class="overlay center"></div>');
+    overlay.addEventListener('click', function(e){ if(e.target===overlay) closeEventForm(); });
+    var modal=el('<div class="modal"></div>');
+
+    var head=el('<div class="panel-head"><h2 style="font-size:17px;">사내 일정 등록</h2></div>');
+    var closeBtn=el('<button class="icon-btn" type="button">'+ICON.close+'</button>');
+    closeBtn.addEventListener('click', closeEventForm);
+    head.appendChild(closeBtn);
+    modal.appendChild(head);
+
+    var form=el('<form class="stack" style="gap:14px;"></form>');
+    form.appendChild(el('<div class="field"><label for="ev-title">제목</label><input class="input" id="ev-title" type="text" placeholder="예: 팀 회의" required /></div>'));
+
+    var dateRow=el('<div class="field-row"></div>');
+    var evDateField=el('<div class="field"><label>날짜</label></div>');
+    var evDateDG=makeDateField('2026-08-17', function(){}, { min:'2026-08-01', max:'2026-08-31' });
+    evDateField.appendChild(evDateDG.el);
+    dateRow.appendChild(evDateField);
+    dateRow.appendChild(el('<div class="field"><label for="ev-start">시작시간</label><input class="input" id="ev-start" type="time" value="10:00" /></div>'));
+    dateRow.appendChild(el('<div class="field"><label for="ev-end">종료시간</label><input class="input" id="ev-end" type="time" value="11:00" /></div>'));
+    form.appendChild(dateRow);
+
+    form.appendChild(el('<div class="field"><label for="ev-loc">장소 <span style="font-weight:400;color:var(--text-faint);">(선택)</span></label><input class="input" id="ev-loc" type="text" placeholder="예: 회의실 A" /></div>'));
+
+    var deptField=el('<div class="field"><label for="ev-dept">공개 범위</label></div>');
+    var deptSel=el('<select class="input" id="ev-dept"></select>');
+    deptSel.appendChild(el('<option value="">전사 공통</option>'));
+    DEPARTMENTS.forEach(function(d){ deptSel.appendChild(el('<option value="'+d.name+'">'+d.name+'만</option>')); });
+    deptField.appendChild(deptSel);
+    form.appendChild(deptField);
+
+    form.appendChild(el('<div class="field"><label for="ev-desc">설명 <span style="font-weight:400;color:var(--text-faint);">(선택)</span></label><textarea class="input" id="ev-desc" rows="2"></textarea></div>'));
+
+    form.appendChild(el('<div class="btn-row"><button class="btn primary" type="submit">등록</button></div>'));
+
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var title=form.querySelector('#ev-title').value.trim();
+      if(!title){ toast('제목을 입력하세요.'); return; }
+      EVENTS.push({
+        id:nextEventId++, title:title, startDate:evDateDG.getValue(),
+        startTime:form.querySelector('#ev-start').value, endTimeLabel:form.querySelector('#ev-end').value,
+        location:form.querySelector('#ev-loc').value.trim(), desc:form.querySelector('#ev-desc').value.trim(),
+        createdBy:ME.name, dept:deptSel.value||null
+      });
+      toast('일정이 등록되었습니다.');
+      closeEventForm();
+    });
+
+    modal.appendChild(form);
+    overlay.appendChild(modal);
+    return overlay;
+  }
+  function closeEventForm(){ state.showEventForm=false; render(); }
+
+  /* ============ 사내게시판(일반게시판, 공지사항 상단 고정) ============ */
+  function sortedBoardPosts(){
+    return BOARD_POSTS.slice().sort(function(a,b){
+      if(a.isNotice!==b.isNotice) return a.isNotice ? -1 : 1;
+      return a.createdAt<b.createdAt ? 1 : (a.createdAt>b.createdAt ? -1 : 0);
+    });
+  }
+
+  function renderBoardScreen(){
+    var wrap=el('<div class="grid-2"></div>');
+    var admin=isAdminUser();
+    var posts=sortedBoardPosts();
+
+    // ---- 좌측: 게시글 목록 ----
+    var listCard=el('<div class="card card-pad"></div>');
+    var listHead=el('<div class="card-head"><h2>게시글 목록</h2></div>');
+    var writeBtn=el('<button class="btn primary" type="button" style="padding:7px 14px;">'+ICON.plus+' 작성</button>');
+    writeBtn.addEventListener('click', function(){ state.boardMode='write'; render(); });
+    listHead.appendChild(writeBtn);
+    listCard.appendChild(listHead);
+
+    if(posts.length===0){ listCard.appendChild(el('<div class="empty">등록된 게시글이 없습니다.</div>')); }
+    var selectedId = state.boardSelectedId || (posts[0] && posts[0].id);
+    posts.forEach(function(p){
+      var noticeTag = p.isNotice ? '<span class="pill danger" style="padding:1px 8px;flex:none;">'+ICON.pin+' 공지</span>' : '<span class="pill neutral" style="padding:1px 8px;flex:none;">일반</span>';
+      var clipTag = p.attachmentName ? '<span style="color:var(--text-faint);flex:none;display:flex;">'+ICON.clip+'</span>' : '';
+      var isActive = state.boardMode==='view' && p.id===selectedId;
+      var row=el('<div class="list-row" style="cursor:pointer;align-items:flex-start;'+(isActive?'background:var(--accent-soft);border-radius:var(--r-sm);padding-left:8px;padding-right:8px;':'')+'"><div style="flex:1;min-width:0;"><div style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escapeHtml(p.title)+'</div><div style="font-size:12px;color:var(--text-faint);margin-top:3px;">'+escapeHtml(p.author)+' · '+escapeHtml(p.dept)+' · '+p.createdAt+'</div></div></div>');
+      row.insertBefore(el(noticeTag), row.firstChild);
+      if(clipTag) row.appendChild(el(clipTag));
+      row.addEventListener('click', function(){ state.boardMode='view'; state.boardSelectedId=p.id; render(); });
+      listCard.appendChild(row);
+    });
+
+    // ---- 우측: 상세 보기 또는 작성 레이어 ----
+    var rightCard=el('<div class="card card-pad"></div>');
+
+    if(state.boardMode==='write'){
+      rightCard.appendChild(el('<div class="card-head"><h2>새 글 작성</h2></div>'));
+      var form=el('<form class="stack" style="gap:16px;"></form>');
+      form.appendChild(el('<div class="field"><label for="bd-title">제목</label><input class="input" id="bd-title" type="text" placeholder="제목을 입력하세요" required /></div>'));
+      form.appendChild(el('<div class="field"><label for="bd-content">내용</label><textarea class="input" id="bd-content" rows="6" placeholder="내용을 입력하세요" required></textarea></div>'));
+
+      var fileField=el('<div class="field"><label>첨부파일 <span style="font-weight:400;color:var(--text-faint);">(선택)</span></label>'+
+        '<div class="upload-box" id="bd-upload-box">'+ICON.clip+'<span id="bd-upload-text">파일을 선택하세요</span></div>'+
+        '<input type="file" id="bd-file-input" style="display:none;" />'+
+      '</div>');
+      form.appendChild(fileField);
+      var bdFileInput=fileField.querySelector('#bd-file-input');
+      var bdUploadBox=fileField.querySelector('#bd-upload-box');
+      bdUploadBox.addEventListener('click', function(){ bdFileInput.click(); });
+      bdFileInput.addEventListener('change', function(){
+        var has=bdFileInput.files.length>0;
+        bdUploadBox.classList.toggle('filled', has);
+        fileField.querySelector('#bd-upload-text').textContent = has ? bdFileInput.files[0].name : '파일을 선택하세요';
+      });
+
+      var noticeCb=null;
+      if(admin){
+        var noticeRow=el('<label class="checkbox-row"><input type="checkbox" id="bd-notice" /><span>공지사항으로 등록(목록 상단 고정)</span></label>');
+        noticeCb=noticeRow.querySelector('input');
+        form.appendChild(noticeRow);
+      }
+
+      var btnRow=el('<div class="btn-row"></div>');
+      var cancelWriteBtn=el('<button class="btn ghost" type="button">취소</button>');
+      cancelWriteBtn.addEventListener('click', function(){ state.boardMode='view'; render(); });
+      btnRow.appendChild(cancelWriteBtn);
+      btnRow.appendChild(el('<button class="btn primary" type="submit">등록</button>'));
+      form.appendChild(btnRow);
+
+      form.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        var title=form.querySelector('#bd-title').value.trim();
+        var content=form.querySelector('#bd-content').value.trim();
+        if(!title || !content){ toast('제목과 내용을 입력하세요.'); return; }
+        var newId=nextBoardId++;
+        var isNoticePost = !!(noticeCb && noticeCb.checked);
+        BOARD_POSTS.unshift({
+          id:newId, title:title, content:content, author:ME.name, dept:ME.dept,
+          createdAt:TODAY, isNotice: isNoticePost,
+          attachmentName: bdFileInput.files.length>0 ? bdFileInput.files[0].name : null
+        });
+        if(isNoticePost){
+          pushNotification('NOTICE', '새 공지사항', title, {
+            createdAt:TODAY,
+            action:function(){ state.screen='board'; state.boardMode='view'; state.boardSelectedId=newId; }
+          });
+        }
+        state.boardMode='view'; state.boardSelectedId=newId;
+        toast('게시글이 등록되었습니다.');
+        render();
+      });
+      rightCard.appendChild(form);
+    } else {
+      var selected = posts.find(function(p){return p.id===selectedId;});
+      if(!selected){
+        rightCard.appendChild(el('<div class="empty">좌측 목록에서 게시글을 선택하세요.</div>'));
+      } else {
+        var dHead=el('<div>'+(selected.isNotice?'<span class="pill danger" style="padding:2px 9px;">'+ICON.pin+' 공지</span>':'<span class="pill neutral" style="padding:2px 9px;">일반</span>')+'<h2 style="margin-top:10px;font-size:17px;">'+escapeHtml(selected.title)+'</h2></div>');
+        rightCard.appendChild(dHead);
+        rightCard.appendChild(el('<div class="kv-row" style="margin-top:16px;"><span class="k">작성자</span><span class="v">'+escapeHtml(selected.author)+' · '+escapeHtml(selected.dept)+'</span></div>'));
+        rightCard.appendChild(el('<div class="kv-row" style="margin-top:8px;"><span class="k">작성일</span><span class="v num">'+selected.createdAt+'</span></div>'));
+        rightCard.appendChild(el('<hr class="divider" style="margin:14px 0;" />'));
+        rightCard.appendChild(el('<div class="body-box">'+escapeHtml(selected.content)+'</div>'));
+        if(selected.attachmentName){
+          var attRow=el('<button type="button" class="upload-box filled" style="margin-top:12px;width:100%;justify-content:flex-start;cursor:pointer;">'+ICON.clip+'<span>'+escapeHtml(selected.attachmentName)+'</span></button>');
+          attRow.addEventListener('click', function(){ toast('목업에서는 파일 다운로드가 비활성화되어 있습니다.'); });
+          rightCard.appendChild(attRow);
+        }
+        if(admin){
+          var toggleBtn=el('<button class="btn" type="button" style="align-self:flex-start;margin-top:16px;">'+(selected.isNotice?'공지 해제':'공지사항으로 등록')+'</button>');
+          toggleBtn.addEventListener('click', function(){
+            selected.isNotice=!selected.isNotice;
+            toast(selected.isNotice?'공지사항으로 등록되었습니다.':'공지 등록이 해제되었습니다.');
+            render();
+          });
+          rightCard.appendChild(toggleBtn);
+        }
+      }
+    }
+
+    wrap.appendChild(listCard);
+    wrap.appendChild(rightCard);
+    return wrap;
+  }
+
+  /* ============ Attendance (출퇴근) — 대시보드 체크 카드 ============ */
+  // 데모: 15:30 → 18:05 → 20:05 → 15:30 순으로 순환하며 시간대별 퇴근 체크 규칙을 체험
+  var DEMO_TIME_CYCLE = ['15:30','18:05','20:05'];
+
+  function renderAttendanceActionCard(){
+    var todayRec = attendanceRecords[TODAY] || {};
+    var checkedIn = !!todayRec.checkIn;
+    var checkedOut = !!todayRec.checkOut;
+    var overtimeApproved = hasApprovedOvertime(TODAY);
+    // 18:00~19:00은 누구나 가능, 19:00 이후는 당일 승인된 초과근무 신청이 있어야 가능
+    var canCheckOut = checkedIn && NOW_TIME>='18:00' && (NOW_TIME<'19:00' || overtimeApproved);
+
+    var card=el('<div class="card card-pad"></div>');
+    var head=el('<div class="card-head"><h2>오늘 출퇴근</h2></div>');
+    var nowWrap=el('<div style="display:flex;align-items:center;gap:8px;"></div>');
+    nowWrap.appendChild(el('<span class="now-chip">'+ICON.clock+' '+NOW_TIME+'</span>'));
+    var curIdx=DEMO_TIME_CYCLE.indexOf(NOW_TIME);
+    var nextTime=DEMO_TIME_CYCLE[(curIdx+1)%DEMO_TIME_CYCLE.length] || DEMO_TIME_CYCLE[0];
+    var advBtn=el('<button class="btn ghost" type="button" style="padding:5px 10px;font-size:12px;">'+nextTime+' 이동(데모)</button>');
+    advBtn.addEventListener('click', function(){ NOW_TIME=nextTime; toast('데모: 현재 시각을 '+nextTime+'로 이동했습니다.'); render(); });
+    nowWrap.appendChild(advBtn);
+    head.appendChild(nowWrap);
+    card.appendChild(head);
+
+    var lines=el('<div></div>');
+
+    var inLine=el('<div class="att-line"></div>');
+    inLine.appendChild(el('<span class="att-line-icon">'+ICON.signIn+'</span>'));
+    inLine.appendChild(el('<span class="att-line-label">출근</span>'));
+    inLine.appendChild(el('<span class="att-line-time'+(checkedIn?'':' pending')+'">'+(checkedIn?todayRec.checkIn:'--:--')+'</span>'));
+    if(!checkedIn){
+      var inBtn=el('<button class="btn primary" type="button" style="padding:4px 10px;font-size:12px;">출근 체크</button>');
+      inBtn.addEventListener('click', function(){
+        attendanceRecords[TODAY] = attendanceRecords[TODAY] || {};
+        attendanceRecords[TODAY].checkIn = NOW_TIME;
+        toast('출근이 체크되었습니다. ('+NOW_TIME+')');
+        render();
+      });
+      inLine.appendChild(inBtn);
+    } else {
+      inLine.appendChild(el('<span class="pill success" style="margin-left:auto;">완료</span>'));
+    }
+    lines.appendChild(inLine);
+
+    var outLine=el('<div class="att-line"></div>');
+    outLine.appendChild(el('<span class="att-line-icon">'+ICON.logout+'</span>'));
+    outLine.appendChild(el('<span class="att-line-label">퇴근</span>'));
+    outLine.appendChild(el('<span class="att-line-time'+(checkedOut?'':' pending')+'">'+(checkedOut?todayRec.checkOut:'--:--')+'</span>'));
+    if(todayRec.auto){ outLine.appendChild(el('<span class="pill neutral" style="padding:1px 7px;">자동</span>')); }
+    if(!checkedOut){
+      var outBtn=el('<button class="btn primary" type="button" style="padding:4px 10px;font-size:12px;" '+(!canCheckOut?'disabled':'')+'>퇴근 체크</button>');
+      outBtn.addEventListener('click', function(){
+        if(!canCheckOut) return;
+        attendanceRecords[TODAY].checkOut = NOW_TIME;
+        toast('퇴근이 체크되었습니다. ('+NOW_TIME+')');
+        render();
+      });
+      outLine.appendChild(outBtn);
+      var note = !checkedIn ? '출근 먼저'
+        : NOW_TIME<'18:00' ? '18:00 이후 가능'
+        : (NOW_TIME>='19:00' && !overtimeApproved) ? '19:00 이후는 초과근무 승인 필요'
+        : '';
+      if(note) outLine.appendChild(el('<span class="att-line-note">'+note+'</span>'));
+    } else {
+      outLine.appendChild(el('<span class="pill success" style="margin-left:auto;">완료</span>'));
+    }
+    lines.appendChild(outLine);
+
+    card.appendChild(lines);
+    return card;
+  }
+
+  /* ============ Attendance (출퇴근) — 월별 근태 화면 ============ */
+  var ATT_STATUS_LABEL = { RECORD:'정상', LEAVE:'휴가', WEEKEND:'주말', FUTURE:'예정', NONE:'미체크' };
+
+  function renderMonthPicker(){
+    var wrap=el('<div style="display:flex;align-items:center;gap:10px;"></div>');
+    wrap.appendChild(el('<label style="margin:0;" for="att-month">조회 년월</label>'));
+    var input=el('<input class="input" id="att-month" type="month" style="width:160px;" value="'+state.attMonth+'" />');
+    input.addEventListener('change', function(){ if(input.value){ state.attMonth=input.value; render(); } });
+    wrap.appendChild(input);
+    return wrap;
+  }
+
+  function renderAttendanceSummaryStats(userName){
+    var s=monthSummary(userName, state.attMonth);
+    var row=el('<div class="grid-stats"></div>');
+    row.appendChild(el('<div class="card stat"><div class="label">출근일수</div><div class="value num">'+s.present+'<small>일</small></div></div>'));
+    row.appendChild(el('<div class="card stat"><div class="label">휴가일수</div><div class="value num">'+s.leave+'<small>일</small></div><div class="delta">무급 '+s.unpaidLeave+'일 포함</div></div>'));
+    row.appendChild(el('<div class="card stat"><div class="label">미체크일수</div><div class="value num">'+s.none+'<small>일</small></div></div>'));
+    return row;
+  }
+
+  function renderAttendanceDailyTable(userName){
+    var card=el('<div class="card card-pad"></div>');
+    card.appendChild(el('<div class="card-head"><h2>일자별 근태</h2><span class="hint">'+state.attMonth+'</span></div>'));
+    var tableWrap=el('<div class="table-wrap"></div>');
+    var table=el('<table><thead><tr><th>날짜</th><th>요일</th><th>출근</th><th>퇴근</th><th>상태</th></tr></thead><tbody></tbody></table>');
+    var tbody=table.querySelector('tbody');
+    daysInMonth(state.attMonth).forEach(function(key){
+      var d=new Date(key+'T00:00:00');
+      var wd=WEEKDAY_LABELS[(d.getDay()+6)%7];
+      var a=getAttendanceForDay(userName, key);
+      var inCell='-', outCell='-', statusCell;
+      if(a.kind==='RECORD'){
+        inCell=a.checkIn; outCell=a.checkOut||'-';
+        statusCell = a.checkOut ? '<span class="pill success">정상</span>' : '<span class="pill warning">근무중</span>';
+        if(a.auto) statusCell += ' <span class="pill neutral" style="padding:1px 7px;">자동</span>';
+      } else if(a.kind==='LEAVE'){
+        var unpaidTag = a.unpaid ? ' <span class="pill danger" style="padding:1px 7px;">무급</span>' : '';
+        statusCell = '<span class="pill neutral">'+a.leaveType+'</span>'+unpaidTag;
+      } else if(a.kind==='WEEKEND'){
+        statusCell = '<span class="pill neutral">주말</span>';
+      } else if(a.kind==='FUTURE'){
+        statusCell = '<span class="pill neutral">예정</span>';
+      } else {
+        statusCell = '<span class="pill warning">미체크</span>';
+      }
+      var todayTag = key===TODAY ? ' (오늘)' : '';
+      tbody.appendChild(el('<tr><td class="num">'+key+todayTag+'</td><td>'+wd+'</td><td class="num">'+inCell+'</td><td class="num">'+outCell+'</td><td>'+statusCell+'</td></tr>'));
+    });
+    tableWrap.appendChild(table);
+    card.appendChild(tableWrap);
+    return card;
+  }
+
+  function renderAttendanceScreen(){
+    var wrap=el('<div class="stack"></div>');
+    var admin=isAdminUser();
+
+    var topCard=el('<div class="card card-pad" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;"></div>');
+    topCard.appendChild(renderMonthPicker());
+    if(admin){
+      topCard.appendChild(el('<span class="helptext" style="margin:0;">관리자는 전 직원의 월별 근태기록을 조회할 수 있습니다.</span>'));
+    }
+    wrap.appendChild(topCard);
+
+    if(admin && !state.attViewUserName){
+      // 전 직원 요약 목록
+      var listCard=el('<div class="card card-pad"></div>');
+      listCard.appendChild(el('<div class="card-head"><h2>전 직원 근태 요약</h2><span class="hint">'+state.attMonth+'</span></div>'));
+      var tableWrap=el('<div class="table-wrap"></div>');
+      var table=el('<table><thead><tr><th>이름</th><th>부서</th><th>출근일수</th><th>휴가일수</th><th>미체크</th><th></th></tr></thead><tbody></tbody></table>');
+      var tbody=table.querySelector('tbody');
+      USERS.forEach(function(u){
+        var s=monthSummary(u.name, state.attMonth);
+        var tr=el('<tr><td>'+escapeHtml(u.name)+(u.name===ME.name?' <span class="pill neutral" style="padding:1px 7px;">본인</span>':'')+'</td>'+
+          '<td>'+escapeHtml(u.dept)+'</td><td class="num">'+s.present+'일</td>'+
+          '<td class="num">'+s.leave+'일'+(s.unpaidLeave>0?' <span class="pill danger" style="padding:1px 7px;">무급 '+s.unpaidLeave+'</span>':'')+'</td>'+
+          '<td class="num">'+s.none+'일</td>'+
+          '<td style="text-align:right;"><button class="btn ghost" type="button">상세</button></td></tr>');
+        tr.querySelector('button').addEventListener('click', function(){ state.attViewUserName=u.name; render(); });
+        tbody.appendChild(tr);
+      });
+      tableWrap.appendChild(table);
+      listCard.appendChild(tableWrap);
+      wrap.appendChild(listCard);
+    } else {
+      var targetUser = admin ? state.attViewUserName : ME.name;
+      if(admin){
+        var backRow=el('<div></div>');
+        var backBtn=el('<button class="btn ghost" type="button">← 전체 직원 목록</button>');
+        backBtn.addEventListener('click', function(){ state.attViewUserName=null; render(); });
+        backRow.appendChild(backBtn);
+        wrap.appendChild(backRow);
+        wrap.appendChild(el('<h2 style="font-size:16px;">'+escapeHtml(targetUser)+'님의 근태'+(targetUser===ME.name?' (본인)':'')+'</h2>'));
+      }
+      wrap.appendChild(renderAttendanceSummaryStats(targetUser));
+      wrap.appendChild(renderAttendanceDailyTable(targetUser));
+    }
+
+    return wrap;
+  }
+
+  /* ============ Approvals screen ============ */
+  function renderApprovalsScreen(){
+    var wrap=el('<div class="card card-pad"></div>');
+
+    var tabs=el('<div class="tabs"></div>');
+    [['PENDING','대기 중'],['DONE','처리완료']].forEach(function(t){
+      var b=el('<button class="tab'+(state.approvalsTab===t[0]?' active':'')+'" type="button">'+t[1]+'</button>');
+      b.addEventListener('click', function(){ state.approvalsTab=t[0]; render(); });
+      tabs.appendChild(b);
+    });
+    wrap.appendChild(tabs);
+
+    var filterRow=el('<div style="display:flex;gap:8px;margin-bottom:16px;"></div>');
+    [['ALL','전체'],['LEAVE','연차'],['DAILY','일일보고'],['WEEKLY','주간보고'],['OVERTIME','초과근무'],['TRIP','출장신청'],['TRIP_REPORT','출장결과보고']].forEach(function(t){
+      var active = state.approvalsTypeFilter===t[0];
+      var b=el('<button class="btn ghost" type="button" style="padding:6px 12px;'+(active?'background:var(--accent-soft);color:var(--accent-strong);font-weight:700;':'')+'">'+t[1]+'</button>');
+      b.addEventListener('click', function(){ state.approvalsTypeFilter=t[0]; render(); });
+      filterRow.appendChild(b);
+    });
+    wrap.appendChild(filterRow);
+
+    var items = approvalQueue.filter(function(a){
+      var tabMatch = state.approvalsTab==='PENDING' ? a.status==='PENDING' : a.status!=='PENDING';
+      var typeMatch = state.approvalsTypeFilter==='ALL' || a.type===state.approvalsTypeFilter;
+      return tabMatch && typeMatch;
+    });
+
+    if(items.length===0){
+      wrap.appendChild(el('<div class="empty">해당하는 결재 건이 없습니다.</div>'));
+    } else {
+      var tableWrap=el('<div class="table-wrap"></div>');
+      var table=el('<table><thead><tr><th>유형</th><th>신청자</th><th>내용</th><th>상신일</th><th>상태</th><th></th></tr></thead><tbody></tbody></table>');
+      var tbody=table.querySelector('tbody');
+      items.forEach(function(a){
+        var tr=el('<tr>'+
+          '<td><span class="pill neutral">'+TYPE_LABEL[a.type]+'</span></td>'+
+          '<td>'+a.requester+' <span style="color:var(--text-faint);">· '+a.dept+'</span></td>'+
+          '<td>'+a.summary+'</td>'+
+          '<td class="num">'+a.submittedAt+'</td>'+
+          '<td>'+statusPill(a.status)+'</td>'+
+          '<td style="text-align:right;"><button class="btn ghost" type="button">'+(a.status==='PENDING'?'검토':'상세')+'</button></td>'+
+        '</tr>');
+        tr.querySelector('button').addEventListener('click', function(){ openApproval(a.id); });
+        tbody.appendChild(tr);
+      });
+      tableWrap.appendChild(table);
+      wrap.appendChild(tableWrap);
+    }
+
+    return wrap;
+  }
+
+  function openApproval(id){ state.detailApprovalId=id; render(); }
+  function closeApproval(){ state.detailApprovalId=null; render(); }
+
+  function renderApprovalPanel(){
+    var a = approvalQueue.find(function(x){return x.id===state.detailApprovalId;});
+    var overlay=el('<div class="overlay"></div>');
+    overlay.addEventListener('click', function(e){ if(e.target===overlay) closeApproval(); });
+
+    var panel=el('<div class="panel"></div>');
+    var head=el('<div class="panel-head"><div><span class="pill neutral">'+TYPE_LABEL[a.type]+'</span><h2 style="margin-top:10px;font-size:17px;">'+a.summary+'</h2></div></div>');
+    var closeBtn=el('<button class="icon-btn" type="button">'+ICON.close+'</button>');
+    closeBtn.addEventListener('click', closeApproval);
+    head.appendChild(closeBtn);
+    panel.appendChild(head);
+
+    var kv=el('<div class="kv"></div>');
+    kv.appendChild(el('<div class="kv-row"><span class="k">신청자</span><span class="v">'+a.requester+' · '+a.dept+'</span></div>'));
+    kv.appendChild(el('<div class="kv-row"><span class="k">상신일</span><span class="v num">'+a.submittedAt+'</span></div>'));
+    kv.appendChild(el('<div class="kv-row"><span class="k">상태</span><span class="v">'+statusPill(a.status)+'</span></div>'));
+    panel.appendChild(kv);
+    panel.appendChild(el('<hr class="divider" />'));
+    if(a.type==='LEAVE'){
+      panel.appendChild(el(fieldReadonly('사유', a.reason)));
+    } else if(a.type==='OVERTIME'){
+      panel.appendChild(el('<div class="kv-row"><span class="k">희망 퇴근시간</span><span class="v num">'+a.otFields.expectedEndTime+'</span></div>'));
+      panel.appendChild(el(fieldReadonly('업무내용', a.otFields.workDetail)));
+      panel.appendChild(el(fieldReadonly('사유', a.otFields.reason)));
+    } else if(a.type==='TRIP'){
+      var tf=a.tripFields;
+      panel.appendChild(el('<div class="kv-row"><span class="k">구분</span><span class="v">'+tf.tripType+'출장</span></div>'));
+      panel.appendChild(el('<div class="kv-row"><span class="k">기간</span><span class="v num">'+tf.startDate+' ~ '+tf.endDate+'</span></div>'));
+      panel.appendChild(el('<div class="kv-row"><span class="k">목적지</span><span class="v">'+escapeHtml(tf.destination)+'</span></div>'));
+      if(tf.transport){ panel.appendChild(el('<div class="kv-row"><span class="k">교통편</span><span class="v">'+escapeHtml(tf.transport)+'</span></div>')); }
+      panel.appendChild(el(fieldReadonly('출장 목적', tf.purpose)));
+    } else if(a.type==='TRIP_REPORT'){
+      var rf=a.trFields;
+      var total=rf.transportCost+(rf.hasLodging?rf.lodgingCost:0)+rf.dailyAllowance+rf.mealAllowance;
+      panel.appendChild(el('<div class="kv-row"><span class="k">교통편</span><span class="v">'+escapeHtml(rf.transport||'-')+'</span></div>'));
+      panel.appendChild(el('<div class="kv-row"><span class="k">교통비</span><span class="v num">'+rf.transportCost.toLocaleString()+'원</span></div>'));
+      if(rf.transportAttachmentName){
+        panel.appendChild(el('<div class="upload-box filled" style="margin-top:-4px;margin-bottom:8px;">'+ICON.clip+'<span>'+escapeHtml(rf.transportAttachmentName)+'</span></div>'));
+      }
+      panel.appendChild(el('<div class="kv-row"><span class="k">숙박비</span><span class="v num">'+(rf.hasLodging?(rf.lodgingCost.toLocaleString()+'원'):'해당없음')+'</span></div>'));
+      if(rf.hasLodging && rf.lodgingAttachmentName){
+        panel.appendChild(el('<div class="upload-box filled" style="margin-top:-4px;margin-bottom:8px;">'+ICON.clip+'<span>'+escapeHtml(rf.lodgingAttachmentName)+'</span></div>'));
+      }
+      panel.appendChild(el('<div class="kv-row"><span class="k">일비</span><span class="v num">'+rf.dailyAllowance.toLocaleString()+'원</span></div>'));
+      panel.appendChild(el('<div class="kv-row"><span class="k">식비</span><span class="v num">'+rf.mealAllowance.toLocaleString()+'원</span></div>'));
+      panel.appendChild(el('<div class="kv-row"><span class="k">합계 청구액</span><span class="v num" style="color:var(--accent-strong);">'+total.toLocaleString()+'원</span></div>'));
+      panel.appendChild(el(fieldReadonly('출장업무 처리내용', rf.workContent)));
+    } else {
+      panel.appendChild(el(fieldsBlockHtml(a.type, a.fields)));
+    }
+
+    if(a.status==='PENDING'){
+      var commentField=el('<div class="field"><label for="ap-comment">결재 의견 <span style="font-weight:400;color:var(--text-faint);">(선택)</span></label><textarea class="input" id="ap-comment" rows="2" placeholder="의견을 입력하세요"></textarea></div>');
+      panel.appendChild(commentField);
+
+      var btnRow=el('<div class="btn-row" style="justify-content:stretch;"><button class="btn danger-o" type="button" style="flex:1;">반려</button><button class="btn primary" type="button" style="flex:1;">승인</button></div>');
+      var rejectBtn=btnRow.children[0], approveBtn=btnRow.children[1];
+      rejectBtn.addEventListener('click', function(){ decideApproval(a, 'REJECTED', commentField.querySelector('textarea').value); });
+      approveBtn.addEventListener('click', function(){ decideApproval(a, 'APPROVED', commentField.querySelector('textarea').value); });
+      panel.appendChild(btnRow);
+    } else {
+      var stampClass = a.status==='APPROVED' ? '' : 'reject';
+      var stampText = a.status==='APPROVED' ? '승인' : '반려';
+      panel.appendChild(el('<div><span class="stamp '+stampClass+'">'+stampText+' · '+ (a.decidedAt||'') +'</span></div>'));
+      if(a.comment){ panel.appendChild(el('<div class="body-box">"'+a.comment+'"</div>')); }
+    }
+
+    overlay.appendChild(panel);
+    return overlay;
+  }
+
+  function decideApproval(a, result, comment){
+    a.status = result;
+    a.decidedAt = TODAY;
+    a.comment = comment || (result==='APPROVED' ? '승인합니다.' : '');
+    toast(result==='APPROVED' ? '승인 처리되었습니다.' : '반려 처리되었습니다.');
+    render();
+  }
+
+  /* ============ Admin - 회사 기본정보 ============ */
+  function renderAdminCompanyScreen(){
+    var card=el('<div class="card card-pad content-narrow"><div class="card-head"><h2>회사 기본정보</h2><span class="hint">시스템 내 1건만 존재</span></div></div>');
+    var form=el('<form class="stack" style="gap:16px;"></form>');
+    form.appendChild(el('<div class="field"><label for="co-name">회사명</label><input class="input" id="co-name" type="text" value="'+escapeHtml(COMPANY.name)+'" /></div>'));
+    var row=el('<div class="field-row"></div>');
+    row.appendChild(el('<div class="field"><label for="co-biz">사업자등록번호</label><input class="input" id="co-biz" type="text" value="'+escapeHtml(COMPANY.bizNo)+'" /></div>'));
+    row.appendChild(el('<div class="field"><label for="co-ceo">대표자</label><input class="input" id="co-ceo" type="text" value="'+escapeHtml(COMPANY.ceo)+'" /></div>'));
+    form.appendChild(row);
+    form.appendChild(el('<div class="field"><label for="co-sched">근무제</label><input class="input" id="co-sched" type="text" value="'+escapeHtml(COMPANY.workSchedule)+'" /></div>'));
+
+    var basisField=el('<div class="field"><label for="co-basis">전사 기본 연차산정기준</label></div>');
+    var basisSel=el('<select class="input" id="co-basis"><option value="FISCAL_YEAR">회계연도 기준</option><option value="HIRE_DATE">입사일 기준</option></select>');
+    basisSel.value=COMPANY.defaultLeaveBasis;
+    basisField.appendChild(basisSel);
+    basisField.appendChild(el('<div class="helptext">부서별로 개별 설정하지 않으면 이 기준을 상속합니다.</div>'));
+    form.appendChild(basisField);
+
+    form.appendChild(el('<hr class="divider" />'));
+    form.appendChild(el('<div style="font-size:13px;font-weight:700;color:var(--text-muted);">연차(시간) 계산 설정</div>'));
+
+    var workTimeRow=el('<div class="field-row"></div>');
+    var workStartField=el('<div class="field"><label>출근 시간</label></div>');
+    var workStartSel=el('<select class="input"></select>');
+    var workEndField=el('<div class="field"><label>퇴근 시간</label></div>');
+    var workEndSel=el('<select class="input"></select>');
+    hourOptions().forEach(function(h){
+      workStartSel.appendChild(el('<option value="'+h+'">'+h+'</option>'));
+      workEndSel.appendChild(el('<option value="'+h+'">'+h+'</option>'));
+    });
+    workStartSel.value=COMPANY.workStartTime; workEndSel.value=COMPANY.workEndTime;
+    workStartField.appendChild(workStartSel);
+    workEndField.appendChild(workEndSel);
+    workTimeRow.appendChild(workStartField); workTimeRow.appendChild(workEndField);
+    form.appendChild(workTimeRow);
+    form.appendChild(el('<div class="helptext">연차(시간) 신청 시 이 근무시간 범위 안에서만 시작시간·사용시간을 선택할 수 있습니다.</div>'));
+
+    var hourRow1=el('<div class="field-row"></div>');
+    hourRow1.appendChild(el('<div class="field"><label for="co-stdhours">1일 환산 기준시간</label><input class="input" id="co-stdhours" type="number" min="1" max="24" value="'+COMPANY.standardWorkHoursPerDay+'" /></div>'));
+    hourRow1.appendChild(el('<div class="field"><label for="co-unit">신청 단위(시간)</label><input class="input" id="co-unit" type="number" min="1" max="8" value="'+COMPANY.hourlyLeaveUnitHours+'" /></div>'));
+    hourRow1.appendChild(el('<div class="field"><label for="co-max">1회 신청 상한(시간)</label><input class="input" id="co-max" type="number" min="1" max="8" value="'+COMPANY.hourlyLeaveMaxHours+'" /></div>'));
+    form.appendChild(hourRow1);
+
+    var hourRow2=el('<div class="field-row"></div>');
+    var lunchStartField=el('<div class="field"><label>점심시간 시작</label></div>');
+    var lunchStartSel=el('<select class="input"></select>');
+    var lunchEndField=el('<div class="field"><label>점심시간 종료</label></div>');
+    var lunchEndSel=el('<select class="input"></select>');
+    hourOptions().forEach(function(h){
+      lunchStartSel.appendChild(el('<option value="'+h+'">'+h+'</option>'));
+      lunchEndSel.appendChild(el('<option value="'+h+'">'+h+'</option>'));
+    });
+    lunchStartSel.value=COMPANY.lunchStart; lunchEndSel.value=COMPANY.lunchEnd;
+    lunchStartField.appendChild(lunchStartSel);
+    lunchEndField.appendChild(lunchEndSel);
+    hourRow2.appendChild(lunchStartField); hourRow2.appendChild(lunchEndField);
+    form.appendChild(hourRow2);
+    form.appendChild(el('<div class="helptext">연차(시간) 신청 시 이 점심시간과 겹치는 구간은 자동으로 차감 시간에서 제외됩니다.</div>'));
+
+    form.appendChild(el('<hr class="divider" />'));
+    form.appendChild(el('<div style="font-size:13px;font-weight:700;color:var(--text-muted);">출장비 단가 설정(출장결과보고 일비·식비 자동 계산에 사용)</div>'));
+    var tripRateRow=el('<div class="field-row"></div>');
+    var dailyRateField=el('<div class="field"><label for="co-daily-rate">일비 단가(원/일)</label><input class="input" id="co-daily-rate" type="text" value="'+COMPANY.dailyAllowanceRate.toLocaleString()+'" /></div>');
+    var mealRateField=el('<div class="field"><label for="co-meal-rate">식비 단가(원/일)</label><input class="input" id="co-meal-rate" type="text" value="'+COMPANY.mealAllowanceRate.toLocaleString()+'" /></div>');
+    tripRateRow.appendChild(dailyRateField); tripRateRow.appendChild(mealRateField);
+    form.appendChild(tripRateRow);
+    var dailyRateVal=COMPANY.dailyAllowanceRate, mealRateVal=COMPANY.mealAllowanceRate;
+    attachMoneyFormat(dailyRateField.querySelector('input'), function(v){ dailyRateVal=v; });
+    attachMoneyFormat(mealRateField.querySelector('input'), function(v){ mealRateVal=v; });
+    form.appendChild(el('<div class="helptext">시외출장 결과보고 시 "단가 × 출장일수"로 자동 계산되어 청구됩니다.</div>'));
+
+    form.appendChild(el('<div class="btn-row"><button class="btn primary" type="submit">저장</button></div>'));
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      COMPANY.name=form.querySelector('#co-name').value.trim();
+      COMPANY.bizNo=form.querySelector('#co-biz').value.trim();
+      COMPANY.ceo=form.querySelector('#co-ceo').value.trim();
+      COMPANY.workSchedule=form.querySelector('#co-sched').value.trim();
+      COMPANY.defaultLeaveBasis=basisSel.value;
+      COMPANY.workStartTime=workStartSel.value;
+      COMPANY.workEndTime=workEndSel.value;
+      COMPANY.standardWorkHoursPerDay=Number(form.querySelector('#co-stdhours').value)||8;
+      COMPANY.hourlyLeaveUnitHours=Number(form.querySelector('#co-unit').value)||2;
+      COMPANY.hourlyLeaveMaxHours=Number(form.querySelector('#co-max').value)||6;
+      COMPANY.lunchStart=lunchStartSel.value;
+      COMPANY.lunchEnd=lunchEndSel.value;
+      COMPANY.dailyAllowanceRate=dailyRateVal;
+      COMPANY.mealAllowanceRate=mealRateVal;
+      toast('회사 정보가 저장되었습니다.');
+      render();
+    });
+    card.appendChild(form);
+    return card;
+  }
+
+  /* ============ Admin - 조직/사용자 관리 ============ */
+  function renderAdminUsersScreen(){
+    var wrap=el('<div class="card card-pad"></div>');
+    wrap.appendChild(el('<div class="card-head"><h2>사용자 목록</h2><span class="hint">'+USERS.length+'명</span></div>'));
+    var addBtn=el('<div style="margin-bottom:14px;"><button class="btn" type="button">'+ICON.plus+' 사용자 추가</button></div>');
+    addBtn.querySelector('button').addEventListener('click', function(){
+      var id = Math.max.apply(null, USERS.map(function(u){return u.id;}))+1;
+      USERS.push({ id:id, name:'새 사용자', dept:DEPARTMENTS[0].name, position:'사원', role:'MEMBER', hireDate:TODAY, status:'재직' });
+      state.editingUserId=id;
+      render();
+    });
+    wrap.appendChild(addBtn);
+
+    var tableWrap=el('<div class="table-wrap"></div>');
+    var table=el('<table><thead><tr><th>이름</th><th>부서</th><th>직급</th><th>역할</th><th>입사일</th><th>상태</th><th></th></tr></thead><tbody></tbody></table>');
+    var tbody=table.querySelector('tbody');
+    var ROLE_LABEL={MEMBER:'일반 사용자', APPROVER:'결재자', ADMIN:'관리자'};
+    USERS.forEach(function(u){
+      var tr=el('<tr><td>'+escapeHtml(u.name)+'</td><td>'+escapeHtml(u.dept)+'</td><td>'+escapeHtml(u.position)+'</td>'+
+        '<td><span class="pill neutral">'+ROLE_LABEL[u.role]+'</span></td><td class="num">'+u.hireDate+'</td>'+
+        '<td>'+(u.status==='재직'?'<span class="pill success">재직</span>':'<span class="pill danger">'+u.status+'</span>')+'</td>'+
+        '<td style="text-align:right;"><button class="btn ghost" type="button">수정</button></td></tr>');
+      tr.querySelector('button').addEventListener('click', function(){ state.editingUserId=u.id; render(); });
+      tbody.appendChild(tr);
+    });
+    tableWrap.appendChild(table);
+    wrap.appendChild(tableWrap);
+    return wrap;
+  }
+
+  function renderUserEditPanel(){
+    var u=USERS.find(function(x){return x.id===state.editingUserId;});
+    var overlay=el('<div class="overlay"></div>');
+    overlay.addEventListener('click', function(e){ if(e.target===overlay) closeUserEdit(); });
+    var panel=el('<div class="panel"></div>');
+    var head=el('<div class="panel-head"><h2 style="font-size:17px;">사용자 정보 수정</h2></div>');
+    var closeBtn=el('<button class="icon-btn" type="button">'+ICON.close+'</button>');
+    closeBtn.addEventListener('click', closeUserEdit);
+    head.appendChild(closeBtn);
+    panel.appendChild(head);
+
+    var form=el('<form class="stack" style="gap:14px;"></form>');
+    form.appendChild(el('<div class="field"><label for="u-name">이름</label><input class="input" id="u-name" type="text" value="'+escapeHtml(u.name)+'" /></div>'));
+
+    var deptField=el('<div class="field"><label for="u-dept">부서</label></div>');
+    var deptSel=el('<select class="input" id="u-dept"></select>');
+    DEPARTMENTS.forEach(function(d){ deptSel.appendChild(el('<option value="'+d.name+'">'+d.name+'</option>')); });
+    deptSel.value=u.dept;
+    deptField.appendChild(deptSel);
+    form.appendChild(deptField);
+
+    form.appendChild(el('<div class="field"><label for="u-pos">직급</label><input class="input" id="u-pos" type="text" value="'+escapeHtml(u.position)+'" /></div>'));
+
+    var hireField=el('<div class="field"><label>입사일</label></div>');
+    var hireDG=makeDateField(u.hireDate, function(){});
+    hireField.appendChild(hireDG.el);
+    form.appendChild(hireField);
+
+    var roleField=el('<div class="field"><label for="u-role">권한</label></div>');
+    var roleSel=el('<select class="input" id="u-role"><option value="MEMBER">일반 사용자</option><option value="APPROVER">결재자</option><option value="ADMIN">관리자</option></select>');
+    roleSel.value=u.role;
+    roleField.appendChild(roleSel);
+    form.appendChild(roleField);
+
+    var statusField=el('<div class="field"><label for="u-status">재직상태</label></div>');
+    var statusSel=el('<select class="input" id="u-status"><option value="재직">재직</option><option value="휴직">휴직</option><option value="퇴사">퇴사</option></select>');
+    statusSel.value=u.status;
+    statusField.appendChild(statusSel);
+    form.appendChild(statusField);
+
+    form.appendChild(el('<div class="btn-row"><button class="btn primary" type="submit">저장</button></div>'));
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      u.name=form.querySelector('#u-name').value.trim();
+      u.dept=deptSel.value;
+      u.position=form.querySelector('#u-pos').value.trim();
+      u.hireDate=hireDG.getValue();
+      u.role=roleSel.value;
+      u.status=statusSel.value;
+      toast('사용자 정보가 저장되었습니다.');
+      closeUserEdit();
+    });
+    panel.appendChild(form);
+    overlay.appendChild(panel);
+    return overlay;
+  }
+  function closeUserEdit(){ state.editingUserId=null; render(); }
+
+  /* ============ Admin - 결재선 설정 ============ */
+  function renderAdminApprovalLinesScreen(){
+    var wrap=el('<div class="card card-pad content-narrow"></div>');
+    wrap.appendChild(el('<div class="card-head"><h2>결재선 설정</h2></div>'));
+
+    var filterRow=el('<div class="field-row" style="margin-bottom:18px;"></div>');
+    var deptField=el('<div class="field"><label for="al-dept">부서</label></div>');
+    var deptSel=el('<select class="input" id="al-dept"></select>');
+    DEPARTMENTS.forEach(function(d){ deptSel.appendChild(el('<option value="'+d.name+'">'+d.name+'</option>')); });
+    deptSel.value=state.apLineDept;
+    deptSel.addEventListener('change', function(){ state.apLineDept=deptSel.value; render(); });
+    deptField.appendChild(deptSel);
+    filterRow.appendChild(deptField);
+
+    var docField=el('<div class="field"><label for="al-doc">문서유형</label></div>');
+    var docSel=el('<select class="input" id="al-doc"><option value="LEAVE">연차</option><option value="DAILY">일일업무보고</option><option value="WEEKLY">주간업무보고</option></select>');
+    docSel.value=state.apLineDocType;
+    docSel.addEventListener('change', function(){ state.apLineDocType=docSel.value; render(); });
+    docField.appendChild(docSel);
+    filterRow.appendChild(docField);
+
+    wrap.appendChild(filterRow);
+
+    var stepsKey=state.apLineDept+'|'+state.apLineDocType;
+    var steps=APPROVAL_LINES[stepsKey] || [];
+
+    var stepsWrap=el('<div class="stack" style="gap:10px;"></div>');
+    if(steps.length===0){ stepsWrap.appendChild(el('<div class="empty">설정된 결재선이 없습니다. 단계를 추가하세요.</div>')); }
+    steps.forEach(function(name, idx){
+      var row=el('<div style="display:flex;align-items:center;gap:10px;">'+
+        '<span class="pill neutral" style="flex:none;">'+(idx+1)+'단계</span>'+
+        '<input class="input" type="text" value="'+escapeHtml(name)+'" />'+
+      '</div>');
+      var input=row.querySelector('input');
+      input.addEventListener('change', function(){ steps[idx]=input.value; });
+      var delBtn=el('<button class="btn ghost" type="button" style="flex:none;color:var(--danger);">'+ICON.trash+'</button>');
+      delBtn.addEventListener('click', function(){ steps.splice(idx,1); render(); });
+      row.appendChild(delBtn);
+      stepsWrap.appendChild(row);
+    });
+    wrap.appendChild(stepsWrap);
+
+    var addStepBtn=el('<div style="margin-top:14px;"><button class="btn" type="button">'+ICON.plus+' 단계 추가</button></div>');
+    addStepBtn.querySelector('button').addEventListener('click', function(){
+      if(!APPROVAL_LINES[stepsKey]) APPROVAL_LINES[stepsKey]=[];
+      APPROVAL_LINES[stepsKey].push('승인자 미지정');
+      render();
+    });
+    wrap.appendChild(addStepBtn);
+
+    var saveBtn=el('<div class="btn-row" style="margin-top:18px;"><button class="btn primary" type="button">저장</button></div>');
+    saveBtn.querySelector('button').addEventListener('click', function(){ toast('결재선이 저장되었습니다.'); });
+    wrap.appendChild(saveBtn);
+
+    return wrap;
+  }
+
+  /* ============ Admin - 연차정책 설정 ============ */
+  function renderAdminLeavePolicyScreen(){
+    var wrap=el('<div class="stack"></div>');
+
+    var policyCard=el('<div class="card card-pad"></div>');
+    policyCard.appendChild(el('<div class="card-head"><h2>근속연수별 발생일수</h2></div>'));
+    var pTableWrap=el('<div class="table-wrap"></div>');
+    var pTable=el('<table><thead><tr><th>근속연수(이상)</th><th>근속연수(미만)</th><th>발생일수</th><th></th></tr></thead><tbody></tbody></table>');
+    var pBody=pTable.querySelector('tbody');
+    LEAVE_POLICY.forEach(function(p){
+      var tr=el('<tr><td><input class="input num" type="number" value="'+p.minYears+'" style="width:80px;" /></td>'+
+        '<td><input class="input num" type="number" value="'+p.maxYears+'" style="width:80px;" /></td>'+
+        '<td><input class="input num" type="number" step="0.5" value="'+p.grantDays+'" style="width:80px;" /></td>'+
+        '<td style="text-align:right;"><button class="btn ghost" type="button" style="color:var(--danger);">'+ICON.trash+'</button></td></tr>');
+      var inputs=tr.querySelectorAll('input');
+      inputs[0].addEventListener('change', function(){ p.minYears=Number(inputs[0].value); });
+      inputs[1].addEventListener('change', function(){ p.maxYears=Number(inputs[1].value); });
+      inputs[2].addEventListener('change', function(){ p.grantDays=Number(inputs[2].value); });
+      tr.querySelector('button').addEventListener('click', function(){
+        LEAVE_POLICY.splice(LEAVE_POLICY.indexOf(p),1); render();
+      });
+      pBody.appendChild(tr);
+    });
+    pTableWrap.appendChild(pTable);
+    policyCard.appendChild(pTableWrap);
+    var addPolicyBtn=el('<div style="margin-top:14px;"><button class="btn" type="button">'+ICON.plus+' 구간 추가</button></div>');
+    addPolicyBtn.querySelector('button').addEventListener('click', function(){
+      var id=Math.max.apply(null, LEAVE_POLICY.map(function(p){return p.id;}).concat([0]))+1;
+      LEAVE_POLICY.push({id:id, minYears:0, maxYears:1, grantDays:11});
+      render();
+    });
+    policyCard.appendChild(addPolicyBtn);
+    wrap.appendChild(policyCard);
+
+    var typeCard=el('<div class="card card-pad"></div>');
+    typeCard.appendChild(el('<div class="card-head"><h2>연차 유형</h2><span class="hint">카테고리·증빙 필수 여부 관리</span></div>'));
+    var tTableWrap=el('<div class="table-wrap"></div>');
+    var tTable=el('<table><thead><tr><th>유형명</th><th>입력 방식</th><th>카테고리</th><th>증빙 필수</th><th>급여 유형</th></tr></thead><tbody></tbody></table>');
+    var tBody=tTable.querySelector('tbody');
+    LEAVE_TYPES.forEach(function(t){
+      var tr=el('<tr></tr>');
+      tr.appendChild(el('<td>'+escapeHtml(t.name)+'</td>'));
+      tr.appendChild(el('<td><span class="pill neutral">'+INPUT_MODE_LABEL[t.inputMode]+'</span></td>'));
+      var catTd=el('<td></td>');
+      var catSel=el('<select class="input" style="width:150px;padding:6px 8px;"><option value="ANNUAL_DEDUCT">연차 차감형</option><option value="SPECIAL">특별휴가</option><option value="OFFICIAL">공가</option></select>');
+      catSel.value=t.category;
+      catSel.addEventListener('change', function(){ t.category=catSel.value; });
+      catTd.appendChild(catSel);
+      tr.appendChild(catTd);
+      var reqTd=el('<td></td>');
+      var reqRow=el('<label class="checkbox-row"><input type="checkbox" /></label>');
+      reqRow.querySelector('input').checked=t.requireAttachment;
+      reqRow.querySelector('input').addEventListener('change', function(e){ t.requireAttachment=e.target.checked; });
+      reqTd.appendChild(reqRow);
+      tr.appendChild(reqTd);
+      var payTd=el('<td></td>');
+      var paySel=el('<select class="input" style="width:110px;padding:6px 8px;"><option value="PAID">유급</option><option value="UNPAID">무급</option></select>');
+      paySel.value=t.payType;
+      paySel.addEventListener('change', function(){ t.payType=paySel.value; });
+      payTd.appendChild(paySel);
+      tr.appendChild(payTd);
+      tBody.appendChild(tr);
+    });
+    tTableWrap.appendChild(tTable);
+    typeCard.appendChild(tTableWrap);
+    typeCard.appendChild(el('<div class="helptext" style="margin-top:10px;">변경 사항은 즉시 반영됩니다(연차 신청 화면의 카테고리 그룹에 바로 적용).</div>'));
+    wrap.appendChild(typeCard);
+
+    return wrap;
+  }
+
+  /* ============ 공용: 편집 가능한 표 섹션 ============ */
+  // dateRange: {startKey, endKey} — 지정 시 종료일 컬럼이 시작일 이전으로 선택되지 않도록 제약
+  function editableTableSection(title, rows, columns, newRowFactory, dateRange){
+    var card=el('<div class="card card-pad"></div>');
+    card.appendChild(el('<div class="card-head"><h2>'+title+'</h2></div>'));
+    var tableWrap=el('<div class="table-wrap"></div>');
+    var theadHtml='<tr>'+columns.map(function(c){return '<th>'+c.label+'</th>';}).join('')+'<th></th></tr>';
+    var table=el('<table><thead>'+theadHtml+'</thead><tbody></tbody></table>');
+    var tbody=table.querySelector('tbody');
+    if(rows.length===0){
+      tbody.appendChild(el('<tr><td colspan="'+(columns.length+1)+'"><div class="empty">등록된 항목이 없습니다. 아래 "추가" 버튼으로 입력하세요.</div></td></tr>'));
+    }
+    rows.forEach(function(row, idx){
+      var tr=el('<tr></tr>');
+      var endFieldRef=null; // dateRange의 종료일 필드를 시작일 핸들러에서 참조하기 위한 지연 바인딩
+      columns.forEach(function(c){
+        var td=el('<td style="min-width:130px;"></td>');
+        if(c.type==='date'){
+          var isStart=dateRange && c.key===dateRange.startKey;
+          var isEnd=dateRange && c.key===dateRange.endKey;
+          var dg=makeDateField(row[c.key]||'', function(v){
+            row[c.key]=v;
+            if(isStart && endFieldRef){
+              endFieldRef.setMin(v);
+              var ev=endFieldRef.getValue();
+              if(ev && v && ev<v){ endFieldRef.setValue(v); row[dateRange.endKey]=v; }
+            }
+            if(isEnd){
+              var sv=row[dateRange.startKey];
+              if(sv && v && v<sv){ dg.setValue(sv); row[c.key]=sv; }
+            }
+          });
+          if(isStart) dg.setMin(''); // 시작일 자체는 제약 없음
+          if(isEnd){ dg.setMin(row[dateRange.startKey]||''); endFieldRef=dg; }
+          td.appendChild(dg.el);
+        } else {
+          var inp=el('<input class="input" type="text" value="'+escapeHtml(row[c.key]||'')+'" />');
+          if(c.format==='phone'){
+            attachPhoneFormat(inp, row, c.key);
+          } else {
+            inp.addEventListener('change', function(){ row[c.key]=inp.value; });
+          }
+          td.appendChild(inp);
+        }
+        tr.appendChild(td);
+      });
+      var delTd=el('<td style="text-align:right;"></td>');
+      var delBtn=el('<button class="btn ghost" type="button" style="color:var(--danger);">'+ICON.trash+'</button>');
+      delBtn.addEventListener('click', function(){ rows.splice(idx,1); render(); });
+      delTd.appendChild(delBtn);
+      tr.appendChild(delTd);
+      tbody.appendChild(tr);
+    });
+    tableWrap.appendChild(table);
+    card.appendChild(tableWrap);
+    var addBtn=el('<div style="margin-top:14px;"><button class="btn" type="button">'+ICON.plus+' 추가</button></div>');
+    addBtn.querySelector('button').addEventListener('click', function(){ rows.push(newRowFactory()); render(); });
+    card.appendChild(addBtn);
+    return card;
+  }
+
+  /* ============ 인사기록카드(표준서식) ============ */
+  function renderHrRecordScreen(){
+    var wrap=el('<div class="stack"></div>');
+
+    function bindField(label, key, type, format){
+      if(type==='date'){
+        var df=el('<div class="field"><label>'+label+'</label></div>');
+        var dg=makeDateField(HR_RECORD[key]||'', function(v){ HR_RECORD[key]=v; });
+        df.appendChild(dg.el);
+        return df;
+      }
+      var f=el('<div class="field"><label>'+label+'</label><input class="input" type="text" value="'+escapeHtml(HR_RECORD[key]||'')+'" /></div>');
+      var inp=f.querySelector('input');
+      if(format==='phone'){
+        attachPhoneFormat(inp, HR_RECORD, key);
+      } else {
+        inp.addEventListener('change', function(e){ HR_RECORD[key]=e.target.value; });
+      }
+      return f;
+    }
+
+    var head=el('<div class="card card-pad"><div class="card-head"><h2>기본 인적사항</h2><span class="hint">표준서식</span></div></div>');
+    var basicGrid=el('<div style="display:grid;grid-template-columns:132px 1fr;gap:20px;align-items:start;"></div>');
+    var photoBox=el('<div class="upload-box" style="flex-direction:column;height:150px;justify-content:center;cursor:pointer;text-align:center;">'+ICON.upload+'<span style="margin-top:6px;">사진 등록</span></div>');
+    photoBox.addEventListener('click', function(){ toast('목업에서는 사진 업로드가 비활성화되어 있습니다.'); });
+    basicGrid.appendChild(photoBox);
+
+    var fieldsWrap=el('<div class="form-grid"></div>');
+    fieldsWrap.appendChild(bindField('성명(한글)','nameKr'));
+    fieldsWrap.appendChild(bindField('성명(영문)','nameEn'));
+    fieldsWrap.appendChild(bindField('생년월일','birth','date'));
+    var genderField=el('<div class="field"><label>성별</label></div>');
+    var genderSel=el('<select class="input"><option value="남">남</option><option value="여">여</option></select>');
+    genderSel.value=HR_RECORD.gender;
+    genderSel.addEventListener('change', function(){ HR_RECORD.gender=genderSel.value; });
+    genderField.appendChild(genderSel);
+    fieldsWrap.appendChild(genderField);
+    fieldsWrap.appendChild(bindField('휴대전화','mobile',null,'phone'));
+    fieldsWrap.appendChild(bindField('이메일','email'));
+    basicGrid.appendChild(fieldsWrap);
+    head.appendChild(basicGrid);
+
+    var addrField=bindField('주소','address');
+    addrField.style.marginTop='16px';
+    head.appendChild(addrField);
+
+    var emgRow=el('<div class="field-row" style="margin-top:16px;"></div>');
+    emgRow.appendChild(bindField('비상연락처 관계','emergencyRelation'));
+    emgRow.appendChild(bindField('비상연락처 성명','emergencyName'));
+    emgRow.appendChild(bindField('비상연락처 전화','emergencyPhone',null,'phone'));
+    head.appendChild(emgRow);
+    wrap.appendChild(head);
+
+    wrap.appendChild(editableTableSection('학력사항', HR_RECORD.education, [
+      { key:'school', label:'학교명' }, { key:'major', label:'전공' }, { key:'degree', label:'구분' },
+      { key:'admissionDate', label:'입학일', type:'date' }, { key:'graduationDate', label:'졸업일', type:'date' }
+    ], function(){ return { school:'', major:'', degree:'', admissionDate:'', graduationDate:'' }; },
+    { startKey:'admissionDate', endKey:'graduationDate' }));
+
+    wrap.appendChild(editableTableSection('경력사항', HR_RECORD.career, [
+      { key:'company', label:'회사명' }, { key:'position', label:'직위/부서' },
+      { key:'startDate', label:'입사일', type:'date' }, { key:'endDate', label:'퇴사일', type:'date' }, { key:'duty', label:'담당업무' }
+    ], function(){ return { company:'', position:'', startDate:'', endDate:'', duty:'' }; },
+    { startKey:'startDate', endKey:'endDate' }));
+
+    wrap.appendChild(editableTableSection('자격/면허사항', HR_RECORD.certificates, [
+      { key:'name', label:'자격명' }, { key:'date', label:'취득일', type:'date' }, { key:'issuer', label:'발급기관' }
+    ], function(){ return { name:'', date:'', issuer:'' }; }));
+
+    var milCard=el('<div class="card card-pad"></div>');
+    milCard.appendChild(el('<div class="card-head"><h2>병역사항</h2></div>'));
+    var milGrid=el('<div class="form-grid"></div>');
+    var statusField=el('<div class="field"><label>병역구분</label></div>');
+    var statusSel=el('<select class="input"><option>해당없음</option><option>군필</option><option>미필</option><option>면제</option></select>');
+    statusSel.value=HR_RECORD.militaryStatus;
+    statusSel.addEventListener('change', function(){ HR_RECORD.militaryStatus=statusSel.value; render(); });
+    statusField.appendChild(statusSel);
+    milGrid.appendChild(statusField);
+    if(HR_RECORD.militaryStatus==='군필'){
+      milGrid.appendChild(bindField('군별','militaryBranch'));
+      milGrid.appendChild(bindField('계급','militaryRank'));
+      milGrid.appendChild(bindField('복무기간','militaryPeriod'));
+    }
+    milCard.appendChild(milGrid);
+    wrap.appendChild(milCard);
+
+    wrap.appendChild(editableTableSection('가족사항', HR_RECORD.family, [
+      { key:'relation', label:'관계' }, { key:'name', label:'성명' }, { key:'birth', label:'생년월일', type:'date' }, { key:'cohabit', label:'동거여부' }
+    ], function(){ return { relation:'', name:'', birth:'', cohabit:'동거' }; }));
+
+    var agreeCard=el('<div class="card card-pad"></div>');
+    var agreeRow=el('<label class="checkbox-row"><input type="checkbox" /><span>상기 기재사항은 사실과 다름없음을 서약합니다.</span></label>');
+    agreeRow.querySelector('input').checked=HR_RECORD.agreed;
+    agreeRow.querySelector('input').addEventListener('change', function(e){ HR_RECORD.agreed=e.target.checked; });
+    agreeCard.appendChild(agreeRow);
+    if(HR_RECORD.submittedAt){
+      agreeCard.appendChild(el('<div class="helptext" style="margin-top:8px;">마지막 저장: '+HR_RECORD.submittedAt+'</div>'));
+    }
+    var saveBtn=el('<div class="btn-row" style="margin-top:16px;"><button class="btn primary" type="button">저장</button></div>');
+    saveBtn.querySelector('button').addEventListener('click', function(){
+      if(!HR_RECORD.agreed){ toast('서약에 동의해야 저장할 수 있습니다.'); return; }
+      HR_RECORD.submittedAt=TODAY;
+      toast('인사기록카드가 저장되었습니다.');
+      render();
+    });
+    agreeCard.appendChild(saveBtn);
+    wrap.appendChild(agreeCard);
+
+    return wrap;
+  }
+
+  seedNotifications();
+  render();
+})();
+</script>
