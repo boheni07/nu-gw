@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.env
+.env.local
+*.log
+Thumbs.db
+.DS_Store
+uploads/*
+!uploads/.gitkeep
+docs
+mockup
+.bkit
+.claude

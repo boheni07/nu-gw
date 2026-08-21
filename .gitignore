@@ -7,3 +7,15 @@ build/
 *.log
 .DS_Store
 Thumbs.db
+
+# 로컬 파일 기반 데이터 저장소(module-1) — seed.json만 버전관리, 런타임 db.json은 제외
+lib/data/db.json
+tsconfig.tsbuildinfo
+
+# 로컬 파일 스토리지(module-3, bkend.ai Storage 대체) — 업로드된 증빙파일 실물
+uploads/*
+!uploads/.gitkeep
+
+# Claude Code 로컬 작업 상태(머신별 워크트리·잠금파일) — launch.json만 버전관리
+.claude/worktrees/
+.claude/scheduled_tasks.lock

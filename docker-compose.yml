@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nugw-postgres
+    environment:
+      POSTGRES_DB: nugw
+      POSTGRES_USER: nugw
+      POSTGRES_PASSWORD: nugw-pg-2026!
+    ports:
+      # 로컬 개발(호스트)에서도 접속할 수 있도록 5433으로 노출한다(로컬에 이미 5432가 떠 있을 수 있어 충돌 방지).
+      - "5433:5432"
+    volumes:
+      - nugw-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nugw -d nugw"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  nugw:
+    build: .
+    image: nugw:latest
+    container_name: nugw
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://nugw:nugw-pg-2026!@postgres:5432/nugw
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      # 업로드 파일(증빙 등)만 별도 볼륨에 영속화한다. 데이터는 이제 Postgres(nugw-pgdata)에 저장된다.
+      - nugw-uploads:/app/uploads
+    restart: unless-stopped
+
+volumes:
+  nugw-pgdata:
+  nugw-uploads:

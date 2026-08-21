@@ -1,0 +1,306 @@
+{
+  "companySettings": {
+    "id": "company-1",
+    "companyName": "(주)엔유지더블유",
+    "businessRegNo": "123-45-67890",
+    "ceoName": "정하나",
+    "workSchedule": "주 5일 (월~금, 09:00~18:00)",
+    "defaultLeaveBasis": "FISCAL_YEAR",
+    "standardWorkHoursPerDay": 8,
+    "lunchStart": "12:00",
+    "lunchEnd": "13:00",
+    "hourlyLeaveUnitHours": 2,
+    "hourlyLeaveMaxHours": 6,
+    "slackWebhookUrl": null
+  },
+  "tripAllowanceRates": [
+    {
+      "id": "tar-2026",
+      "year": 2026,
+      "dailyRate": 30000,
+      "mealRate": 25000,
+      "lodgingCapPerNight": 100000
+    }
+  ],
+  "departments": [
+    {
+      "id": "dept-1",
+      "name": "마케팅팀",
+      "parentId": null
+    },
+    {
+      "id": "dept-2",
+      "name": "디자인팀",
+      "parentId": null
+    },
+    {
+      "id": "dept-3",
+      "name": "개발팀",
+      "parentId": null
+    },
+    {
+      "id": "dept-4",
+      "name": "영업팀",
+      "parentId": null
+    }
+  ],
+  "users": [
+    {
+      "id": "user-1",
+      "name": "김도윤",
+      "email": "dyoon.kim@nugw.co.kr",
+      "departmentId": "dept-1",
+      "position": "대리",
+      "hireDate": "2024-03-04",
+      "role": "ADMIN",
+      "employmentStatus": "ACTIVE",
+      "passwordHash": "703cdadf2d348c3cafa3bd1adcee8edf:721642ebe3a95ef38f6109c192aece29518cb37c4466385d4430ad0bb1a98afb55fd0907ba1262318b8523998aebf4e5b8934a54227b23b79229f6e90c968f65",
+      "resignedAt": null
+    },
+    {
+      "id": "user-2",
+      "name": "정민아",
+      "email": "mina.jung@nugw.co.kr",
+      "departmentId": "dept-1",
+      "position": "팀장",
+      "hireDate": "2019-05-12",
+      "role": "APPROVER",
+      "employmentStatus": "ACTIVE",
+      "passwordHash": "703cdadf2d348c3cafa3bd1adcee8edf:721642ebe3a95ef38f6109c192aece29518cb37c4466385d4430ad0bb1a98afb55fd0907ba1262318b8523998aebf4e5b8934a54227b23b79229f6e90c968f65",
+      "resignedAt": null
+    },
+    {
+      "id": "user-3",
+      "name": "이하준",
+      "email": "hajun.lee@nugw.co.kr",
+      "departmentId": "dept-1",
+      "position": "사원",
+      "hireDate": "2025-01-06",
+      "role": "MEMBER",
+      "employmentStatus": "ACTIVE",
+      "passwordHash": "703cdadf2d348c3cafa3bd1adcee8edf:721642ebe3a95ef38f6109c192aece29518cb37c4466385d4430ad0bb1a98afb55fd0907ba1262318b8523998aebf4e5b8934a54227b23b79229f6e90c968f65",
+      "resignedAt": null
+    },
+    {
+      "id": "user-4",
+      "name": "박서연",
+      "email": "seoyeon.park@nugw.co.kr",
+      "departmentId": "dept-2",
+      "position": "주임",
+      "hireDate": "2023-09-18",
+      "role": "MEMBER",
+      "employmentStatus": "ACTIVE",
+      "passwordHash": "703cdadf2d348c3cafa3bd1adcee8edf:721642ebe3a95ef38f6109c192aece29518cb37c4466385d4430ad0bb1a98afb55fd0907ba1262318b8523998aebf4e5b8934a54227b23b79229f6e90c968f65",
+      "resignedAt": null
+    },
+    {
+      "id": "user-5",
+      "name": "정하늘",
+      "email": "haneul.jung@nugw.co.kr",
+      "departmentId": "dept-3",
+      "position": "사원",
+      "hireDate": "2025-07-01",
+      "role": "MEMBER",
+      "employmentStatus": "ACTIVE",
+      "passwordHash": "703cdadf2d348c3cafa3bd1adcee8edf:721642ebe3a95ef38f6109c192aece29518cb37c4466385d4430ad0bb1a98afb55fd0907ba1262318b8523998aebf4e5b8934a54227b23b79229f6e90c968f65",
+      "resignedAt": null
+    },
+    {
+      "id": "user-6",
+      "name": "최지우",
+      "email": "jiwoo.choi@nugw.co.kr",
+      "departmentId": "dept-4",
+      "position": "대리",
+      "hireDate": "2022-11-03",
+      "role": "MEMBER",
+      "employmentStatus": "ACTIVE",
+      "passwordHash": "703cdadf2d348c3cafa3bd1adcee8edf:721642ebe3a95ef38f6109c192aece29518cb37c4466385d4430ad0bb1a98afb55fd0907ba1262318b8523998aebf4e5b8934a54227b23b79229f6e90c968f65",
+      "resignedAt": null
+    },
+    {
+      "id": "user-master",
+      "name": "총괄관리자",
+      "email": "master@nubiz.kr",
+      "departmentId": "dept-1",
+      "position": "총괄관리자",
+      "hireDate": "2026-01-01",
+      "role": "ADMIN",
+      "employmentStatus": "ACTIVE",
+      "resignedAt": null,
+      "passwordHash": "54ef8e75f3893ad5904641a49c1b85ba:9ca92e20c05a06f6b8676d30a0c0c12a2c153adb658e85dbf36f95bb83fb260d9809996c1cd067439fb9e39fa27e3d05b255c362d0435be5a94aeeb616851808"
+    }
+  ],
+  "sessions": [],
+  "approvalLines": [
+    {
+      "id": "al-1",
+      "departmentId": "dept-1",
+      "documentType": "LEAVE",
+      "isActive": true
+    },
+    {
+      "id": "al-2",
+      "departmentId": "dept-1",
+      "documentType": "DAILY_REPORT",
+      "isActive": true
+    },
+    {
+      "id": "al-3",
+      "departmentId": "dept-1",
+      "documentType": "WEEKLY_REPORT",
+      "isActive": true
+    },
+    {
+      "id": "al-4",
+      "departmentId": "dept-1",
+      "documentType": "OVERTIME",
+      "isActive": true
+    }
+  ],
+  "approvalLineSteps": [
+    {
+      "id": "als-1",
+      "approvalLineId": "al-1",
+      "stepOrder": 1,
+      "approverUserId": "user-2",
+      "isParallel": false
+    },
+    {
+      "id": "als-2",
+      "approvalLineId": "al-2",
+      "stepOrder": 1,
+      "approverUserId": "user-2",
+      "isParallel": false
+    },
+    {
+      "id": "als-3",
+      "approvalLineId": "al-3",
+      "stepOrder": 1,
+      "approverUserId": "user-2",
+      "isParallel": false
+    },
+    {
+      "id": "als-4",
+      "approvalLineId": "al-3",
+      "stepOrder": 2,
+      "approverUserId": "user-1",
+      "isParallel": false
+    },
+    {
+      "id": "als-5",
+      "approvalLineId": "al-4",
+      "stepOrder": 1,
+      "approverUserId": "user-2",
+      "isParallel": false
+    }
+  ],
+  "approvals": [],
+  "approvalStepLogs": [],
+  "delegateAssignments": [],
+  "leavePolicies": [
+    {
+      "id": "lp-1",
+      "minYears": 0,
+      "maxYears": 1,
+      "grantDays": 11
+    },
+    {
+      "id": "lp-2",
+      "minYears": 1,
+      "maxYears": 3,
+      "grantDays": 15
+    },
+    {
+      "id": "lp-3",
+      "minYears": 3,
+      "maxYears": 5,
+      "grantDays": 16
+    },
+    {
+      "id": "lp-4",
+      "minYears": 5,
+      "maxYears": 10,
+      "grantDays": 18
+    }
+  ],
+  "leaveTypeConfigs": [
+    {
+      "id": "lt-1",
+      "code": "ANNUAL_DAY",
+      "name": "연차(일)",
+      "inputMode": "DAY_RANGE",
+      "category": "ANNUAL_DEDUCT",
+      "requireAttachment": false,
+      "payType": "PAID"
+    },
+    {
+      "id": "lt-2",
+      "code": "ANNUAL_HOUR",
+      "name": "연차(시간)",
+      "inputMode": "HOUR_RANGE",
+      "category": "ANNUAL_DEDUCT",
+      "requireAttachment": false,
+      "payType": "PAID"
+    },
+    {
+      "id": "lt-3",
+      "code": "CONGRATULATION",
+      "name": "경조사",
+      "inputMode": "DAY_RANGE",
+      "category": "SPECIAL",
+      "requireAttachment": true,
+      "payType": "PAID"
+    },
+    {
+      "id": "lt-4",
+      "code": "SICK",
+      "name": "병가",
+      "inputMode": "DAY_RANGE",
+      "category": "SPECIAL",
+      "requireAttachment": true,
+      "payType": "UNPAID"
+    },
+    {
+      "id": "lt-5",
+      "code": "OFFICIAL",
+      "name": "공가(예비군·건강검진 등)",
+      "inputMode": "DAY_RANGE",
+      "category": "OFFICIAL",
+      "requireAttachment": true,
+      "payType": "PAID"
+    }
+  ],
+  "leaveBalances": [],
+  "leaveRequests": [],
+  "attachments": [],
+  "events": [
+    {
+      "id": "ev-1",
+      "title": "전사 워크숍",
+      "startAt": "2026-08-21T10:00:00",
+      "endAt": "2026-08-21T17:00:00",
+      "location": "본사 대강당",
+      "description": "하반기 전사 워크숍 및 팀빌딩",
+      "createdBy": "user-1",
+      "departmentTag": null
+    },
+    {
+      "id": "ev-2",
+      "title": "마케팅팀 주간회의",
+      "startAt": "2026-08-25T10:00:00",
+      "endAt": "2026-08-25T11:00:00",
+      "location": "회의실 A",
+      "description": null,
+      "createdBy": "user-2",
+      "departmentTag": "dept-1"
+    }
+  ],
+  "attendanceRecords": [],
+  "overtimeRequests": [],
+  "businessTrips": [],
+  "tripReports": [],
+  "dailyReports": [],
+  "weeklyReports": [],
+  "notifications": [],
+  "hrRecords": []
+}

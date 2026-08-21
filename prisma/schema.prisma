@@ -1,0 +1,303 @@
+// Design Ref: lib/data/store.ts DB 인터페이스를 그대로 관계형 스키마로 옮긴 것.
+// 상태/유형 값은 Prisma enum 대신 String으로 두고 TS 쪽에서 리터럴 유니온으로 캐스팅한다
+// (MilitaryStatus 등 한글 값이 섞여 있어 enum 식별자로 쓸 수 없고, 매핑 코드를 단순하게 유지하기 위함).
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CompanySettings {
+  id                     String  @id
+  companyName            String
+  businessRegNo          String
+  ceoName                String
+  workSchedule           String
+  defaultLeaveBasis      String
+  standardWorkHoursPerDay Int
+  lunchStart             String
+  lunchEnd               String
+  hourlyLeaveUnitHours   Int
+  hourlyLeaveMaxHours    Int
+  slackWebhookUrl        String?
+}
+
+/// 출장비 단가(기준연도별). 계산에는 항상 year가 가장 큰(최근) 행을 사용한다.
+model TripAllowanceRate {
+  id                 String @id
+  year               Int    @unique
+  dailyRate          Int
+  mealRate           Int
+  lodgingCapPerNight Int
+}
+
+model Department {
+  id         String   @id
+  name       String
+  parentId   String?
+}
+
+model User {
+  id              String    @id
+  name            String
+  email           String    @unique
+  passwordHash    String
+  departmentId    String
+  position        String
+  hireDate        String
+  role            String
+  employmentStatus String
+  resignedAt      String?
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt String
+}
+
+model ApprovalLine {
+  id           String              @id
+  departmentId String
+  documentType String
+  isActive     Boolean
+  steps        ApprovalLineStep[]
+}
+
+model ApprovalLineStep {
+  id             String       @id
+  approvalLineId String
+  approvalLine   ApprovalLine @relation(fields: [approvalLineId], references: [id], onDelete: Cascade)
+  stepOrder      Int
+  approverUserId String
+  isParallel     Boolean
+}
+
+model Approval {
+  id             String  @id
+  targetType     String
+  targetId       String
+  approvalLineId String
+  // ApprovalStepSnapshot[] — 상신 시점 스냅샷(§3.2), 정규화하지 않고 그대로 보관
+  steps          Json
+  currentStep    Int
+  status         String
+  submitterId    String
+  submittedAt    String
+  completedAt    String?
+  targetVersion  Int
+}
+
+model ApprovalStepLog {
+  id               String  @id
+  approvalId       String
+  stepOrder        Int
+  approverUserId   String
+  representedUserId String
+  action           String
+  comment          String?
+  processedAt      String
+}
+
+model DelegateAssignment {
+  id              String @id
+  delegatorUserId String
+  delegateUserId  String
+  startDate       String
+  endDate         String
+}
+
+model LeavePolicy {
+  id        String @id
+  minYears  Int
+  maxYears  Int
+  grantDays Int
+}
+
+model LeaveTypeConfig {
+  id                String  @id
+  code              String
+  name              String
+  inputMode         String
+  category          String
+  requireAttachment Boolean
+  payType           String
+}
+
+model LeaveBalance {
+  id         String @id
+  userId     String
+  periodYear Int
+  granted    Float
+  used       Float
+}
+
+model LeaveRequest {
+  id          String  @id
+  userId      String
+  leaveTypeId String
+  startDate   String
+  endDate     String
+  startTime   String?
+  endTime     String?
+  days        Float
+  reason      String
+  status      String
+  approvalId  String?
+  version     Int
+  editedAt    String?
+  createdAt   String
+}
+
+model Attachment {
+  id             String @id
+  leaveRequestId String
+  fileName       String
+  fileUrl        String
+  uploadedAt     String
+}
+
+model Event {
+  id             String  @id
+  title          String
+  startAt        String
+  endAt          String
+  location       String?
+  description    String?
+  createdBy      String
+  departmentTag  String?
+}
+
+model AttendanceRecord {
+  id             String  @id
+  userId         String
+  date           String
+  checkInAt      String?
+  checkOutAt     String?
+  status         String
+  autoCheckedOut Boolean
+
+  @@unique([userId, date])
+}
+
+model OvertimeRequest {
+  id              String  @id
+  userId          String
+  date            String
+  expectedEndTime String
+  workDetail      String
+  reason          String
+  status          String
+  approvalId      String?
+  version         Int
+  editedAt        String?
+  createdAt       String
+}
+
+model BusinessTrip {
+  id          String  @id
+  userId      String
+  tripType    String
+  startDate   String
+  endDate     String
+  startTime   String?
+  endTime     String?
+  destination String
+  purpose     String
+  transport   String?
+  status      String
+  approvalId  String?
+  version     Int
+  editedAt    String?
+  createdAt   String
+}
+
+model TripReport {
+  id                   String  @id
+  tripId               String  @unique
+  userId               String
+  workContent          String
+  transport            String
+  transportCost        Int
+  // { fileName, fileUrl } | null
+  transportAttachment  Json?
+  hasLodging           Boolean
+  lodgingCost          Int
+  lodgingAttachment    Json?
+  dailyAllowance       Int
+  mealAllowance        Int
+  status               String
+  approvalId           String?
+  version              Int
+  editedAt             String?
+  createdAt            String
+}
+
+model DailyReport {
+  id           String  @id
+  userId       String
+  reportDate   String
+  todayResult  String
+  tomorrowPlan String
+  notes        String
+  status       String
+  approvalId   String?
+  version      Int
+  editedAt     String?
+  createdAt    String
+
+  @@unique([userId, reportDate])
+}
+
+model WeeklyReport {
+  id             String  @id
+  userId         String
+  weekStartDate  String
+  weekEndDate    String
+  thisWeekResult String
+  nextWeekPlan   String
+  notes          String
+  status         String
+  approvalId     String?
+  version        Int
+  editedAt       String?
+  createdAt      String
+
+  @@unique([userId, weekStartDate])
+}
+
+model Notification {
+  id         String  @id
+  userId     String
+  type       String
+  targetType String
+  targetId   String
+  message    String
+  isRead     Boolean
+  createdAt  String
+}
+
+model HrRecord {
+  userId          String  @id
+  nameKr          String
+  nameEn          String
+  birth           String
+  gender          String
+  mobile          String
+  email           String
+  address         String
+  emergencyContact Json
+  education       Json
+  career          Json
+  certificates    Json
+  family          Json
+  militaryStatus  String
+  militaryBranch  String
+  militaryRank    String
+  militaryPeriod  String
+  agreed          Boolean
+  savedAt         String?
+}
