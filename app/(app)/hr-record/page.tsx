@@ -1,0 +1,40 @@
+// Design Ref: §2.9 인사기록카드 — 사이드바(topbar) 사용자 메뉴에서 진입, 본인만 조회·수정
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/session";
+import { getHrRecord } from "@/lib/data/store";
+import HrRecordClient from "./client";
+import type { HrRecord } from "@/types";
+
+export default async function HrRecordPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login");
+
+  const existing = await getHrRecord(user.id);
+  const initial: HrRecord = existing ?? {
+    userId: user.id,
+    nameKr: user.name,
+    nameEn: "",
+    birth: "",
+    gender: "",
+    mobile: "",
+    email: user.email,
+    address: "",
+    emergencyContact: { relation: "", name: "", phone: "" },
+    education: [],
+    career: [],
+    certificates: [],
+    family: [],
+    militaryStatus: "해당없음",
+    militaryBranch: "",
+    militaryRank: "",
+    militaryPeriod: "",
+    agreed: false,
+    savedAt: null,
+  };
+
+  return (
+    <div className="stack content-narrow">
+      <HrRecordClient initial={initial} />
+    </div>
+  );
+}
