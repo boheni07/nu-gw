@@ -1,0 +1,4 @@
+# Windows(core.autocrlf=true)에서도 Docker 컨테이너(Linux) 안에서 실행되는 셸 스크립트는
+# 반드시 LF 줄바꿈이어야 한다(CRLF면 "exec ./docker-entrypoint.sh: no such file or directory" 오류 발생).
+*.sh text eol=lf
+Dockerfile text eol=lf

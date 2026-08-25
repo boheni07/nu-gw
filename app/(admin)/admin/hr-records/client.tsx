@@ -41,7 +41,7 @@ export default function HrRecordsAdminClient({ initialRows }: { initialRows: HrR
 
   if (selected) {
     return (
-      <div className="stack content-narrow">
+      <div className="stack">
         <button type="button" className="btn ghost" style={{ alignSelf: "flex-start" }} onClick={() => setSelected(null)}>
           <span style={{ display: "inline-block", transform: "rotate(90deg)" }}>
             <ChevronIcon />

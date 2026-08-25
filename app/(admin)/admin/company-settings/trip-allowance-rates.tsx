@@ -72,7 +72,7 @@ export default function TripAllowanceRatesCard({ initial }: { initial: TripAllow
   }
 
   return (
-    <div className="card card-pad content-narrow">
+    <div className="card card-pad">
       <div className="card-head">
         <h2>출장비 단가(기준연도별)</h2>
         <span className="hint">계산에는 가장 최근 기준연도의 값이 사용됩니다</span>

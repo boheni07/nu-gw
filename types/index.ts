@@ -470,3 +470,14 @@ export interface HrRecord {
   agreed: boolean;
   savedAt: string | null; // ISO datetime, 최종 저장일시
 }
+
+/** AUTO: 연도별 법정공휴일 자동 가져오기로 등록됨. MANUAL: 관리자가 직접 추가함. */
+export type HolidaySource = "AUTO" | "MANUAL";
+
+/** 회사 기본정보 §공휴일 지정 — 전사 공통 휴일 목록(부서별 오버라이드 없음). */
+export interface Holiday {
+  id: string;
+  date: string; // YYYY-MM-DD, 전사 유일
+  name: string;
+  source: HolidaySource;
+}

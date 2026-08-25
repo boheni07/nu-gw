@@ -14,6 +14,7 @@ import {
   listLeavePolicies,
   listLeaveRequestsByUser,
   listUsers,
+  setLeaveBalanceGranted,
   updateLeaveRequest,
   updateLeaveRequestIfVersionMatches,
 } from "@/lib/data/store";
@@ -321,9 +322,38 @@ export async function listAttachments(leaveRequestId: string): Promise<Attachmen
   return listAttachmentsByLeaveRequest(leaveRequestId);
 }
 
+/**
+ * 관리자가 전사 연차산정기준/근속연수별 발생일수를 변경한 뒤 "적용"을 눌렀을 때 호출된다.
+ * 재직 중인 전 직원의 periodYear 부여일수(granted)를 현재 기준으로 다시 계산해 덮어쓴다.
+ * 이미 존재하는 잔여현황(LeaveBalance)만 갱신하고, 아직 없는 사용자는 조회 시점(getOrCreateLeaveBalance)에
+ * 현재 기준으로 새로 생성되므로 별도 처리하지 않는다. used(사용일수)는 그대로 둔다.
+ */
+export async function recalculateLeaveBalances(periodYear?: number): Promise<LeaveStatusRow[]> {
+  const year = periodYear ?? new Date().getFullYear();
+  const users = (await listUsers()).filter((u) => u.employmentStatus !== "RESIGNED");
+  const company = await getCompanySettings();
+  const basis = resolveLeaveBasis(company);
+  const policies = await listLeavePolicies();
+
+  for (const u of users) {
+    const existing = await findLeaveBalance(u.id, year);
+    if (!existing) continue; // 아직 없으면 다음 조회 시 현재 기준으로 새로 생성됨
+    const granted =
+      basis === "FISCAL_YEAR"
+        ? calcFiscalYearGrant(u.hireDate, year, policies)
+        : calcHireDateGrant(u.hireDate, `${year}-12-31`, policies);
+    if (granted !== existing.granted) {
+      await setLeaveBalanceGranted(u.id, year, granted);
+    }
+  }
+
+  return getLeaveStatusRows(year);
+}
+
 export interface LeaveStatusRow {
   userId: string;
   userName: string;
+  hireDate: string;
   deptName: string;
   position: string;
   granted: number;
@@ -347,6 +377,7 @@ export async function getLeaveStatusRows(periodYear?: number): Promise<LeaveStat
     rows.push({
       userId: u.id,
       userName: u.name,
+      hireDate: u.hireDate,
       deptName: dept?.name ?? "—",
       position: u.position,
       granted: balance.granted,

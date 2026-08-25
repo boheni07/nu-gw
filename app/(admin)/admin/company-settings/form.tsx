@@ -48,11 +48,11 @@ export default function CompanySettingsForm({ initial }: { initial: CompanySetti
 
   return (
     <form onSubmit={handleSubmit} className="stack" style={{ gap: 16 }}>
-      <div className="field">
-        <label>회사명</label>
-        <input className="input" value={form.companyName} onChange={(e) => set("companyName", e.target.value)} required />
-      </div>
       <div className="field-row">
+        <div className="field">
+          <label>회사명</label>
+          <input className="input" value={form.companyName} onChange={(e) => set("companyName", e.target.value)} required />
+        </div>
         <div className="field">
           <label>사업자등록번호</label>
           <input
@@ -66,10 +66,6 @@ export default function CompanySettingsForm({ initial }: { initial: CompanySetti
           <label>대표자</label>
           <input className="input" value={form.ceoName} onChange={(e) => set("ceoName", e.target.value)} />
         </div>
-      </div>
-      <div className="field">
-        <label>근무제</label>
-        <input className="input" value={form.workSchedule} onChange={(e) => set("workSchedule", e.target.value)} />
       </div>
 
       <hr className="divider" />
@@ -109,6 +105,10 @@ export default function CompanySettingsForm({ initial }: { initial: CompanySetti
       </div>
 
       <div className="field-row">
+        <div className="field">
+          <label>근무제</label>
+          <input className="input" value={form.workSchedule} onChange={(e) => set("workSchedule", e.target.value)} />
+        </div>
         <div className="field">
           <label>점심시간 시작</label>
           <input className="input" type="time" value={form.lunchStart} onChange={(e) => set("lunchStart", e.target.value)} />

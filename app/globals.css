@@ -295,6 +295,19 @@ button.user-chip:hover { background: var(--surface-alt); }
 .stack { display: flex; flex-direction: column; gap: 18px; }
 .row { display: flex; gap: 18px; }
 .grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-stats-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+/* 공휴일 지정 — 한 줄에 2개씩 배치되는 컴팩트 목록(회사 기본정보 §공휴일 지정) */
+.holiday-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.holiday-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--r-sm);
+}
+.holiday-item .meta { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.holiday-item .meta .date { font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
+.holiday-item .meta .weekday { font-size: 12px; color: var(--text-faint); white-space: nowrap; }
+.holiday-item .meta .name { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.holiday-item .actions { display: flex; align-items: center; gap: 8px; flex: none; }
 .grid-2 { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; align-items: start; }
 
 .stat { padding: 18px 20px; }
@@ -410,6 +423,8 @@ button.user-chip:hover { background: var(--surface-alt); }
   .topbar { padding: 0 16px; }
   .content { padding: 18px 16px; }
   .grid-stats { grid-template-columns: 1fr; }
+  .grid-stats-4 { grid-template-columns: 1fr; }
+  .holiday-grid { grid-template-columns: 1fr; }
   .grid-2 { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .row { flex-direction: column; }

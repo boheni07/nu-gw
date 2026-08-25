@@ -20,6 +20,7 @@ import type {
   Department,
   DocumentType,
   Event,
+  Holiday,
   HrRecord,
   LeaveBalance,
   LeavePolicy,
@@ -607,6 +608,14 @@ export async function adjustLeaveBalanceUsed(userId: string, periodYear: number,
   return prisma.leaveBalance.update({ where: { id: current.id }, data: { used: Math.max(0, current.used + delta) } });
 }
 
+/** granted(부여일수)를 덮어쓴다(연차산정기준/발생일수 정책 변경 후 재산정에 사용). used는 건드리지 않는다. */
+export async function setLeaveBalanceGranted(userId: string, periodYear: number, granted: number): Promise<LeaveBalance | undefined> {
+  await ensureSeeded();
+  const current = await prisma.leaveBalance.findFirst({ where: { userId, periodYear } });
+  if (!current) return undefined;
+  return prisma.leaveBalance.update({ where: { id: current.id }, data: { granted } });
+}
+
 /* ---------- LeaveRequest / Attachment (Design Ref: §3.3) ---------- */
 
 export async function listLeaveRequestsByUser(userId: string): Promise<LeaveRequest[]> {
@@ -1065,4 +1074,51 @@ export async function saveHrRecord(userId: string, patch: Omit<HrRecord, "userId
     update: data,
   });
   return row as unknown as HrRecord;
+}
+
+/* ---------- Holiday (Design Ref: 회사 기본정보 §공휴일 지정) ---------- */
+
+export async function listHolidays(year?: number): Promise<Holiday[]> {
+  await ensureSeeded();
+  const rows = await prisma.holiday.findMany({
+    where: year ? { date: { startsWith: `${year}-` } } : undefined,
+    orderBy: { date: "asc" },
+  });
+  return rows as Holiday[];
+}
+
+export async function findHolidayByDate(date: string): Promise<Holiday | undefined> {
+  await ensureSeeded();
+  return undef(await prisma.holiday.findUnique({ where: { date } })) as Holiday | undefined;
+}
+
+export async function createHoliday(input: Omit<Holiday, "id">): Promise<Holiday> {
+  await ensureSeeded();
+  return (await prisma.holiday.create({ data: { id: `hol-${cryptoRandomId()}`, ...input } })) as Holiday;
+}
+
+export async function deleteHoliday(id: string): Promise<boolean> {
+  await ensureSeeded();
+  try {
+    await prisma.holiday.delete({ where: { id } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 연도별 법정공휴일 자동 가져오기 — 이미 등록된 날짜(자동/수동 무관)는 건드리지 않고 건너뛴다
+ * (관리자가 수동으로 수정/삭제한 내용을 덮어쓰지 않기 위함). 새로 추가된 개수를 반환한다.
+ */
+export async function importAutoHolidays(items: { date: string; name: string }[]): Promise<number> {
+  await ensureSeeded();
+  let count = 0;
+  for (const item of items) {
+    const exists = await prisma.holiday.findUnique({ where: { date: item.date } });
+    if (exists) continue;
+    await prisma.holiday.create({ data: { id: `hol-${cryptoRandomId()}`, date: item.date, name: item.name, source: "AUTO" } });
+    count++;
+  }
+  return count;
 }

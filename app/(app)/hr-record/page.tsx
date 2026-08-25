@@ -33,7 +33,7 @@ export default async function HrRecordPage() {
   };
 
   return (
-    <div className="stack content-narrow">
+    <div className="stack">
       <HrRecordClient initial={initial} />
     </div>
   );

@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "lastUpdated": "2026-08-21T09:19:52.233Z",
+  "lastUpdated": "2026-08-25T23:52:50.965Z",
   "activeFeatures": [
     "nu-gw",
     "auth",
@@ -63,7 +63,10 @@
     "trip-report",
     "hr-records",
     "forgot-password",
-    "trip-allowance-rates"
+    "trip-allowance-rates",
+    "recalculate",
+    "holidays",
+    "import"
   ],
   "primaryFeature": "nu-gw",
   "features": {
@@ -76,7 +79,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-08-19T00:11:57.509Z",
-        "lastUpdated": "2026-08-21T08:32:34.160Z"
+        "lastUpdated": "2026-08-25T23:27:19.154Z"
       },
       "lastFile": "D:\\PROJECT\\nu-gw\\types\\index.ts"
     },
@@ -102,7 +105,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-08-19T00:13:22.100Z",
-        "lastUpdated": "2026-08-21T08:34:48.005Z"
+        "lastUpdated": "2026-08-25T23:30:31.700Z"
       },
       "lastFile": "D:\\PROJECT\\nu-gw\\lib\\data\\store.ts"
     },
@@ -154,9 +157,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-08-19T00:14:21.793Z",
-        "lastUpdated": "2026-08-21T08:37:24.384Z"
+        "lastUpdated": "2026-08-25T23:47:50.733Z"
       },
-      "lastFile": "D:\\PROJECT\\nu-gw\\app\\(admin)\\admin\\company-settings\\page.tsx"
+      "lastFile": "D:\\PROJECT\\nu-gw\\app\\(admin)\\admin\\company-settings\\form.tsx"
     },
     "departments": {
       "phase": "do",
@@ -180,9 +183,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-08-19T00:14:31.060Z",
-        "lastUpdated": "2026-08-21T09:19:18.096Z"
+        "lastUpdated": "2026-08-25T23:28:31.928Z"
       },
-      "lastFile": "D:\\PROJECT\\nu-gw\\app\\api\\admin\\approval-lines\\[id]\\route.ts"
+      "lastFile": "D:\\PROJECT\\nu-gw\\app\\api\\admin\\holidays\\[id]\\route.ts"
     },
     "users": {
       "phase": "do",
@@ -349,7 +352,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-08-19T00:42:19.093Z",
-        "lastUpdated": "2026-08-21T08:35:06.543Z"
+        "lastUpdated": "2026-08-25T22:59:36.235Z"
       },
       "lastFile": "D:\\PROJECT\\nu-gw\\lib\\leave\\service.ts"
     },
@@ -427,7 +430,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-08-19T00:47:37.760Z",
-        "lastUpdated": "2026-08-21T08:37:47.467Z"
+        "lastUpdated": "2026-08-25T23:00:17.107Z"
       },
       "lastFile": "D:\\PROJECT\\nu-gw\\app\\(admin)\\admin\\leave-policy\\client.tsx"
     },
@@ -674,9 +677,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-08-19T11:09:36.931Z",
-        "lastUpdated": "2026-08-21T06:28:22.219Z"
+        "lastUpdated": "2026-08-25T23:52:47.031Z"
       },
-      "lastFile": "D:\\PROJECT\\nu-gw\\app\\(app)\\hr-record\\form.tsx"
+      "lastFile": "D:\\PROJECT\\nu-gw\\app\\(app)\\hr-record\\page.tsx"
     },
     "reports": {
       "phase": "do",
@@ -752,7 +755,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-08-20T12:25:11.337Z",
-        "lastUpdated": "2026-08-20T12:26:05.585Z"
+        "lastUpdated": "2026-08-25T23:21:28.874Z"
       },
       "lastFile": "D:\\PROJECT\\nu-gw\\app\\(admin)\\admin\\leave-status\\client.tsx"
     },
@@ -843,7 +846,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-08-21T02:50:02.216Z",
-        "lastUpdated": "2026-08-21T02:51:49.204Z"
+        "lastUpdated": "2026-08-25T23:52:50.963Z"
       },
       "lastFile": "D:\\PROJECT\\nu-gw\\app\\(admin)\\admin\\hr-records\\client.tsx"
     },
@@ -872,6 +875,45 @@
         "lastUpdated": "2026-08-21T08:35:56.621Z"
       },
       "lastFile": "D:\\PROJECT\\nu-gw\\app\\api\\admin\\trip-allowance-rates\\route.ts"
+    },
+    "recalculate": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-08-25T22:59:52.823Z",
+        "lastUpdated": "2026-08-25T22:59:52.823Z"
+      },
+      "lastFile": "D:\\PROJECT\\nu-gw\\app\\api\\admin\\leave-balances\\recalculate\\route.ts"
+    },
+    "holidays": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-08-25T23:28:05.532Z",
+        "lastUpdated": "2026-08-25T23:28:27.678Z"
+      },
+      "lastFile": "D:\\PROJECT\\nu-gw\\app\\api\\admin\\holidays\\route.ts"
+    },
+    "import": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-08-25T23:28:38.939Z",
+        "lastUpdated": "2026-08-25T23:28:38.939Z"
+      },
+      "lastFile": "D:\\PROJECT\\nu-gw\\app\\api\\admin\\holidays\\import\\route.ts"
     }
   },
   "pipeline": {
@@ -882,7 +924,7 @@
   "session": {
     "startedAt": "2026-08-19T00:02:18.833Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-08-21T09:19:52.233Z"
+    "lastActivity": "2026-08-25T23:52:50.965Z"
   },
   "history": [
     {
@@ -4524,6 +4566,210 @@
     {
       "timestamp": "2026-08-21T09:19:52.233Z",
       "feature": "approval-lines",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:55:08.334Z",
+      "feature": "leave",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:55:11.108Z",
+      "feature": "leave",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:55:16.134Z",
+      "feature": "leave-policy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:55:20.297Z",
+      "feature": "leave-policy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:55:36.358Z",
+      "feature": "leave-policy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:55:43.986Z",
+      "feature": "leave-policy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:59:22.587Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:59:28.084Z",
+      "feature": "leave",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:59:36.238Z",
+      "feature": "leave",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T22:59:52.824Z",
+      "feature": "recalculate",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:00:10.133Z",
+      "feature": "leave-policy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:00:17.108Z",
+      "feature": "leave-policy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:17:33.809Z",
+      "feature": "leave-status",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:17:37.908Z",
+      "feature": "leave-status",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:17:43.643Z",
+      "feature": "leave-status",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:20:46.907Z",
+      "feature": "leave-status",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:21:07.692Z",
+      "feature": "leave-status",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:21:17.709Z",
+      "feature": "leave-status",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:21:28.875Z",
+      "feature": "leave-status",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:27:19.157Z",
+      "feature": "nu-gw",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:27:37.644Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:27:46.371Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:28:05.533Z",
+      "feature": "holidays",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:28:27.680Z",
+      "feature": "holidays",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:28:31.929Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:28:38.940Z",
+      "feature": "import",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:28:46.025Z",
+      "feature": "company-settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:28:58.317Z",
+      "feature": "company-settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:29:27.511Z",
+      "feature": "company-settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:30:31.701Z",
+      "feature": "data",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:47:27.477Z",
+      "feature": "company-settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:47:50.734Z",
+      "feature": "company-settings",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:52:47.033Z",
+      "feature": "hr-record",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-25T23:52:50.964Z",
+      "feature": "hr-records",
       "phase": "do",
       "action": "updated"
     }
