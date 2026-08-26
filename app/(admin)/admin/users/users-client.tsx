@@ -56,7 +56,7 @@ export default function UsersClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.get("name"),
-          email: form.get("email"),
+          username: form.get("username"),
           departmentId: form.get("departmentId"),
           position: form.get("position"),
           hireDate: createHireDate,
@@ -85,7 +85,7 @@ export default function UsersClient({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: form.get("name"),
-        email: form.get("email"),
+        username: form.get("username"),
         departmentId: form.get("departmentId"),
         position: form.get("position"),
         hireDate: editHireDate,
@@ -207,7 +207,7 @@ export default function UsersClient({
                 <tr key={u.id}>
                   <td>
                     <div style={{ fontWeight: 600 }}>{u.name}</div>
-                    <div style={{ fontSize: 12, color: "var(--text-faint)" }}>{u.email}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-faint)" }}>{u.username}</div>
                   </td>
                   <td>
                     {deptName(u.departmentId)}
@@ -299,8 +299,8 @@ export default function UsersClient({
               <input name="name" className="input" required />
             </div>
             <div className="field">
-              <label>이메일(로그인 ID)</label>
-              <input name="email" type="email" className="input" required />
+              <label>아이디(로그인 ID)</label>
+              <input name="username" type="text" className="input" required />
             </div>
             <div className="field">
               <label>부서</label>
@@ -356,8 +356,8 @@ export default function UsersClient({
               <input name="name" className="input" defaultValue={editing.name} required />
             </div>
             <div className="field">
-              <label>이메일(로그인 ID)</label>
-              <input name="email" type="email" className="input" defaultValue={editing.email} required />
+              <label>아이디(로그인 ID)</label>
+              <input name="username" type="text" className="input" defaultValue={editing.username} required />
             </div>
             <div className="field">
               <label>부서</label>

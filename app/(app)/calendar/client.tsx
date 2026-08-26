@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Department } from "@/types";
 import { CloseIcon } from "@/lib/ui/icons";
 import DateInput from "@/lib/ui/DateInput";
+import { deriveNthWeekday, type MonthlyMode } from "@/lib/calendar/recurrence";
 
 interface CalEvent {
   id: string;
@@ -17,7 +18,12 @@ interface CalEvent {
   createdBy: string;
   createdByName: string;
   departmentTag: string | null;
+  recurrenceGroupId: string | null;
 }
+
+type RepeatFrequency = "NONE" | "DAILY" | "WEEKLY" | "MONTHLY";
+const REPEAT_LABEL: Record<RepeatFrequency, string> = { NONE: "반복 안함", DAILY: "매일", WEEKLY: "매주", MONTHLY: "매월" };
+const ORDINAL_LABEL: Record<number, string> = { 1: "첫째", 2: "둘째", 3: "셋째", 4: "넷째", "-1": "마지막" };
 interface CalLeave {
   id: string;
   userId: string;
@@ -60,6 +66,25 @@ export default function CalendarClient({
   const [error, setError] = useState<string | null>(null);
   const [dayDetailKey, setDayDetailKey] = useState<string | null>(null);
   const [eventDate, setEventDate] = useState("");
+  const [repeatFrequency, setRepeatFrequency] = useState<RepeatFrequency>("NONE");
+  const [repeatUntil, setRepeatUntil] = useState("");
+  const [repeatDaysOfWeek, setRepeatDaysOfWeek] = useState<number[]>([]);
+  const [repeatMonthlyMode, setRepeatMonthlyMode] = useState<MonthlyMode>("DAY_OF_MONTH");
+
+  // 구글 캘린더처럼 "매주" 선택 시 시작일의 요일을 기본으로 미리 선택해둔다(사용자가 직접 요일을 고르면 그 이후로는 건드리지 않음).
+  useEffect(() => {
+    if (repeatFrequency === "WEEKLY" && repeatDaysOfWeek.length === 0 && eventDate) {
+      setRepeatDaysOfWeek([new Date(eventDate + "T00:00:00").getDay()]);
+    }
+  }, [repeatFrequency, eventDate, repeatDaysOfWeek.length]);
+
+  function toggleRepeatDay(day: number) {
+    setRepeatDaysOfWeek((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day].sort()));
+  }
+
+  const monthlyDayLabel = eventDate ? `매월 ${new Date(eventDate + "T00:00:00").getDate()}일` : "매월 OO일";
+  const monthlyNth = eventDate ? deriveNthWeekday(eventDate) : null;
+  const monthlyNthLabel = monthlyNth ? `매월 ${ORDINAL_LABEL[monthlyNth.ordinal]}주 ${WEEKDAYS[monthlyNth.weekday]}요일` : "매월 N째주 요일요일";
 
   useEffect(() => {
     setLoading(true);
@@ -116,6 +141,15 @@ export default function CalendarClient({
     const endTime = String(form.get("endTime") || "10:00");
     const deptTag = String(form.get("departmentTag") || "");
 
+    if (repeatFrequency !== "NONE" && !repeatUntil) {
+      setError("반복 종료일을 선택해주세요.");
+      return;
+    }
+    if (repeatFrequency === "WEEKLY" && repeatDaysOfWeek.length === 0) {
+      setError("반복할 요일을 하나 이상 선택해주세요.");
+      return;
+    }
+
     const res = await fetch("/api/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -126,6 +160,15 @@ export default function CalendarClient({
         location: form.get("location"),
         description: form.get("description"),
         departmentTag: deptTag || null,
+        repeat:
+          repeatFrequency === "NONE"
+            ? null
+            : {
+                frequency: repeatFrequency,
+                until: repeatUntil,
+                daysOfWeek: repeatFrequency === "WEEKLY" ? repeatDaysOfWeek : undefined,
+                monthlyMode: repeatFrequency === "MONTHLY" ? repeatMonthlyMode : undefined,
+              },
       }),
     });
     const data = await res.json();
@@ -133,18 +176,31 @@ export default function CalendarClient({
       setError(data.error ?? "등록에 실패했습니다.");
       return;
     }
-    setEvents((prev) => [...prev, { ...data, createdByName: "나" }]);
+    const createdEvents: CalEvent[] = Array.isArray(data.events) ? data.events : [];
+    setEvents((prev) => [...prev, ...createdEvents.map((ev) => ({ ...ev, createdByName: "나" }))]);
     setShowForm(false);
     (e.target as HTMLFormElement).reset();
     setEventDate("");
+    setRepeatFrequency("NONE");
+    setRepeatUntil("");
+    setRepeatDaysOfWeek([]);
+    setRepeatMonthlyMode("DAY_OF_MONTH");
   }
 
-  async function handleDeleteEvent(id: string) {
-    if (!confirm("이 일정을 삭제하시겠습니까?")) return;
-    const res = await fetch(`/api/events/${id}`, { method: "DELETE" });
+  /** scope="series"면 같은 반복일정(recurrenceGroupId) 전체를, 아니면 이 occurrence 하나만 삭제한다. */
+  async function handleDeleteEvent(id: string, scope: "single" | "series" = "single") {
+    const confirmMsg = scope === "series" ? "이 반복일정 전체를 삭제하시겠습니까?" : "이 일정을 삭제하시겠습니까?";
+    if (!confirm(confirmMsg)) return;
+    const url = scope === "series" ? `/api/events/${id}?scope=series` : `/api/events/${id}`;
+    const res = await fetch(url, { method: "DELETE" });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
       alert(data.error ?? "삭제에 실패했습니다.");
+      return;
+    }
+    if (scope === "series") {
+      const target = events.find((ev) => ev.id === id);
+      setEvents((prev) => prev.filter((ev) => ev.recurrenceGroupId !== target?.recurrenceGroupId));
       return;
     }
     setEvents((prev) => prev.filter((e) => e.id !== id));
@@ -281,21 +337,40 @@ export default function CalendarClient({
                   <div key={e.id} className="list-row" style={{ alignItems: "flex-start" }}>
                     <span className="pill neutral">{e.startAt.slice(11, 16)}</span>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600 }}>{e.title}</div>
+                      <div style={{ fontWeight: 600 }}>
+                        {e.title}
+                        {e.recurrenceGroupId && (
+                          <span className="pill neutral" style={{ marginLeft: 6, padding: "1px 7px", fontSize: 10.5 }}>
+                            반복
+                          </span>
+                        )}
+                      </div>
                       <div style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 2 }}>
                         {e.location ? `${e.location} · ` : ""}
                         {deptTagName} · {e.createdByName}
                       </div>
                     </div>
                     {canManage && (
-                      <button
-                        type="button"
-                        className="btn ghost"
-                        style={{ flex: "none", color: "var(--danger)" }}
-                        onClick={() => handleDeleteEvent(e.id)}
-                      >
-                        삭제
-                      </button>
+                      <div style={{ display: "flex", gap: 6, flex: "none" }}>
+                        <button
+                          type="button"
+                          className="btn ghost"
+                          style={{ color: "var(--danger)" }}
+                          onClick={() => handleDeleteEvent(e.id)}
+                        >
+                          삭제
+                        </button>
+                        {e.recurrenceGroupId && (
+                          <button
+                            type="button"
+                            className="btn ghost"
+                            style={{ color: "var(--danger)" }}
+                            onClick={() => handleDeleteEvent(e.id, "series")}
+                          >
+                            반복 전체삭제
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 );
@@ -350,6 +425,100 @@ export default function CalendarClient({
                   ))}
                 </select>
               </div>
+              <div className="field-row">
+                <div className="field">
+                  <label>반복</label>
+                  <select
+                    className="input"
+                    value={repeatFrequency}
+                    onChange={(e) => setRepeatFrequency(e.target.value as RepeatFrequency)}
+                  >
+                    {(Object.keys(REPEAT_LABEL) as RepeatFrequency[]).map((f) => (
+                      <option key={f} value={f}>
+                        {REPEAT_LABEL[f]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {repeatFrequency !== "NONE" && (
+                  <div className="field">
+                    <label>반복 종료일</label>
+                    <DateInput value={repeatUntil} onChange={setRepeatUntil} required />
+                  </div>
+                )}
+              </div>
+
+              {repeatFrequency === "WEEKLY" && (
+                <div className="field">
+                  <label>반복 요일</label>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {WEEKDAYS.map((label, d) => {
+                      const active = repeatDaysOfWeek.includes(d);
+                      return (
+                        <button
+                          key={d}
+                          type="button"
+                          className="btn ghost"
+                          style={{
+                            width: 36,
+                            padding: "6px 0",
+                            background: active ? "var(--accent-soft)" : undefined,
+                            color: active ? "var(--accent-strong)" : undefined,
+                            fontWeight: active ? 700 : undefined,
+                          }}
+                          onClick={() => toggleRepeatDay(d)}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {repeatFrequency === "MONTHLY" && (
+                <div className="field">
+                  <label>반복 기준</label>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    <label className="checkbox-row">
+                      <input
+                        type="radio"
+                        name="monthlyMode"
+                        checked={repeatMonthlyMode === "DAY_OF_MONTH"}
+                        onChange={() => setRepeatMonthlyMode("DAY_OF_MONTH")}
+                      />
+                      <span>{monthlyDayLabel}</span>
+                    </label>
+                    <label className="checkbox-row">
+                      <input
+                        type="radio"
+                        name="monthlyMode"
+                        checked={repeatMonthlyMode === "NTH_WEEKDAY"}
+                        onChange={() => setRepeatMonthlyMode("NTH_WEEKDAY")}
+                      />
+                      <span>{monthlyNthLabel}</span>
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {repeatFrequency !== "NONE" && (
+                <p className="helptext" style={{ marginTop: -8 }}>
+                  {eventDate || "시작일"}부터 {repeatUntil || "종료일"}까지{" "}
+                  {repeatFrequency === "DAILY"
+                    ? "매일"
+                    : repeatFrequency === "WEEKLY"
+                      ? `매주 ${repeatDaysOfWeek
+                          .slice()
+                          .sort()
+                          .map((d) => WEEKDAYS[d])
+                          .join("·")}요일`
+                      : repeatMonthlyMode === "DAY_OF_MONTH"
+                        ? monthlyDayLabel
+                        : monthlyNthLabel}{" "}
+                  반복 등록됩니다(최대 200회).
+                </p>
+              )}
               <div className="field">
                 <label>
                   설명 <span style={{ fontWeight: 400, color: "var(--text-faint)" }}>(선택)</span>

@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
       createdBy: e.createdBy,
       createdByName: (await getUserById(e.createdBy))?.name ?? "알수없음",
       departmentTag: e.departmentTag,
+      recurrenceGroupId: e.recurrenceGroupId,
     }))
   );
 

@@ -15,7 +15,7 @@ export default function LoginPage() {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState("dyoon.kim@nugw.co.kr");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -55,13 +55,13 @@ function LoginForm() {
 
         <form onSubmit={handleSubmit}>
           <div className="field">
-            <label htmlFor="email">이메일</label>
+            <label htmlFor="username">아이디</label>
             <input
-              id="email"
+              id="username"
               className="input"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               autoComplete="username"
               autoFocus
               required
@@ -91,7 +91,7 @@ function LoginForm() {
 
         <div className="login-demo">
           <b>테스트 계정 안내.</b> 시드 사용자 계정은 임시 비밀번호 <code>nugw-demo!</code>로 로그인할 수
-          있습니다. 시스템 총괄관리자 계정은 <code>master@nubiz.kr</code> / <code>nubiz@3345</code>입니다.
+          있습니다. 시스템 총괄관리자 계정은 <code>master</code> / <code>nubiz@3345</code>입니다.
         </div>
       </div>
     </div>

@@ -12,7 +12,10 @@ export interface ApprovalRow {
   departmentName: string;
   summary: string;
   dateLabel: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  /** 결재 건 전체의 실제 현재 상태(병렬 승인 등으로 내가 처리해도 다른 승인자가 남아있으면 여전히 PENDING일 수 있음). */
+  status: "PENDING" | "APPROVED" | "REJECTED" | "RECALLED";
+  /** true면 지금 내가 처리해야 할 건(대기 탭). false면 이미 내가 처리를 마친 건(처리완료 탭, 전체 상태와 무관하게 읽기 전용). */
+  awaitingMyAction: boolean;
   isDelegated: boolean;
   comment: string | null;
   fields: { k: string; v: string }[];
@@ -36,8 +39,8 @@ const TYPE_FILTERS: { key: DocumentType | "ALL"; label: string }[] = [
   { key: "TRIP", label: "출장신청" },
   { key: "TRIP_REPORT", label: "출장결과보고" },
 ];
-const STATUS_PILL: Record<string, string> = { PENDING: "warning", APPROVED: "success", REJECTED: "danger" };
-const STATUS_LABEL: Record<string, string> = { PENDING: "대기", APPROVED: "승인", REJECTED: "반려" };
+const STATUS_PILL: Record<string, string> = { PENDING: "warning", APPROVED: "success", REJECTED: "danger", RECALLED: "neutral" };
+const STATUS_LABEL: Record<string, string> = { PENDING: "대기", APPROVED: "승인", REJECTED: "반려", RECALLED: "회수됨" };
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" });
@@ -155,7 +158,7 @@ export default function ApprovalsClient({ pending: initialPending, processed }: 
                   </td>
                   <td style={{ textAlign: "right" }}>
                     <button type="button" className="btn ghost" onClick={() => openDetail(a)}>
-                      {a.status === "PENDING" ? "검토" : "상세"}
+                      {a.awaitingMyAction ? "검토" : "상세"}
                     </button>
                   </td>
                 </tr>
@@ -191,7 +194,7 @@ export default function ApprovalsClient({ pending: initialPending, processed }: 
                 </span>
               </div>
               <div className="kv-row">
-                <span className="k">{detail.status === "PENDING" ? "상신일" : "처리일"}</span>
+                <span className="k">{detail.awaitingMyAction ? "상신일" : "처리일"}</span>
                 <span className="v num">{fmtDate(detail.dateLabel)}</span>
               </div>
               {detail.stepInfo && (
@@ -219,7 +222,7 @@ export default function ApprovalsClient({ pending: initialPending, processed }: 
               ))}
             </div>
 
-            {detail.status === "PENDING" ? (
+            {detail.awaitingMyAction ? (
               <>
                 <div className="field">
                   <label>

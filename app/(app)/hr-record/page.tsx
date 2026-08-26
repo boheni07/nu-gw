@@ -17,7 +17,8 @@ export default async function HrRecordPage() {
     birth: "",
     gender: "",
     mobile: "",
-    email: user.email,
+    // 로그인 아이디(username)는 더 이상 이메일 형식을 보장하지 않아 기본값으로 쓰지 않는다(본인이 직접 입력).
+    email: "",
     address: "",
     emergencyContact: { relation: "", name: "", phone: "" },
     education: [],

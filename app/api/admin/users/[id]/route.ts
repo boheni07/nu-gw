@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { isAdmin } from "@/lib/auth/rbac";
-import { MASTER_ADMIN_EMAIL } from "@/lib/auth/constants";
+import { MASTER_ADMIN_USERNAME } from "@/lib/auth/constants";
 import { hashPassword } from "@/lib/auth/password";
 import { deleteUser, getUserById, listUsers, resignUser, updateUser, updateUserPasswordHash } from "@/lib/data/store";
 
@@ -14,10 +14,10 @@ async function isLastActiveAdmin(userId: string): Promise<boolean> {
   return activeAdmins.length <= 1 && activeAdmins[0]?.id === userId;
 }
 
-/** module-17 — 총괄관리자(master@nubiz.kr)는 다른 관리자가 삭제·강등·퇴사 처리할 수 없다(DB 초기화 시 항상 복원되는 계정 보호). */
+/** module-17 — 총괄관리자(master)는 다른 관리자가 삭제·강등·퇴사 처리할 수 없다(DB 초기화 시 항상 복원되는 계정 보호). */
 async function isMasterAdmin(userId: string): Promise<boolean> {
   const target = await getUserById(userId);
-  return target?.email === MASTER_ADMIN_EMAIL;
+  return target?.username === MASTER_ADMIN_USERNAME;
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

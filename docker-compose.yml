@@ -22,11 +22,14 @@ services:
     build: .
     image: nugw:latest
     container_name: nugw
-    ports:
-      - "3000:3000"
+    # module-22: 출퇴근 체크 사내망(IP) 제한을 위해 실제 클라이언트 IP를 알아야 하는데, Next.js Route
+    # Handler는 raw 소켓에 접근할 수 없다. 그래서 호스트에는 이 컨테이너를 직접 노출하지 않고(포트 미publish),
+    # 아래 nginx 리버스 프록시가 X-Real-IP/X-Forwarded-For를 채워 넘겨준 뒤에만 접근하도록 한다.
+    expose:
+      - "3000"
     environment:
       DATABASE_URL: postgresql://nugw:nugw-pg-2026!@postgres:5432/nugw
-      # 이 앱은 평문 HTTP(3000 포트)만 서비스한다. 나중에 리버스 프록시 등으로 HTTPS를 앞단에 두게 되면
+      # 이 앱은 평문 HTTP만 서비스한다. 나중에 nginx 앞단에 실제 인증서를 붙여 HTTPS로 전환하게 되면
       # COOKIE_SECURE=true로 바꿔 세션 쿠키에 Secure 속성을 다시 켠다(lib/auth/session.ts 참고).
       COOKIE_SECURE: "false"
     depends_on:
@@ -35,6 +38,17 @@ services:
     volumes:
       # 업로드 파일(증빙 등)만 별도 볼륨에 영속화한다. 데이터는 이제 Postgres(nugw-pgdata)에 저장된다.
       - nugw-uploads:/app/uploads
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: nugw-nginx
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - nugw
     restart: unless-stopped
 
 volumes:

@@ -10,7 +10,8 @@ export async function GET() {
 
   const existing = await getHrRecord(user.id);
   if (existing) return NextResponse.json(existing);
-  return NextResponse.json(emptyHrRecord(user.id, user.name, user.email));
+  // 로그인 아이디(username)는 더 이상 이메일 형식을 보장하지 않아 기본값으로 쓰지 않는다.
+  return NextResponse.json(emptyHrRecord(user.id, user.name, ""));
 }
 
 export async function PUT(request: NextRequest) {
@@ -24,7 +25,8 @@ export async function PUT(request: NextRequest) {
   }
 
   const dbUser = await getUserById(user.id);
-  const patch = sanitizeHrRecordPatch(body, dbUser?.name ?? "", user.email, true);
+  const existing = await getHrRecord(user.id);
+  const patch = sanitizeHrRecordPatch(body, dbUser?.name ?? "", existing?.email ?? "", true);
   const saved = await saveHrRecord(user.id, patch);
 
   return NextResponse.json(saved);

@@ -16,10 +16,22 @@ function fmtTime(iso: string | null) {
   const d = new Date(iso);
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
+function hhmmToMinutes(hhmm: string): number {
+  const [h, m] = hhmm.split(":").map(Number);
+  return h * 60 + (m || 0);
+}
+function minutesToHHMM(total: number): string {
+  const h = Math.floor(total / 60);
+  const m = total % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
 
-export default function AttendanceCard() {
+export default function AttendanceCard({ onChanged }: { onChanged?: () => void } = {}) {
   const [today, setToday] = useState<TodayRecord | null>(null);
-  const [overtimeApprovedToday, setOvertimeApprovedToday] = useState(false);
+  // §4.6 — 승인된 초과근무가 있으면 예상 퇴근시간까지만 퇴근 체크를 허용한다.
+  const [overtimeExpectedEndTime, setOvertimeExpectedEndTime] = useState<string | null>(null);
+  // §4.6 — 승인된 연차(시간)가 있으면 그 시작시간부터 조기 퇴근 체크를 허용한다.
+  const [hourlyLeaveStartTime, setHourlyLeaveStartTime] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -43,11 +55,18 @@ export default function AttendanceCard() {
       });
     const overtimeReq = fetch("/api/overtime-requests")
       .then((r) => r.json())
-      .then((list: { date: string; status: string }[]) => {
-        setOvertimeApprovedToday(list.some((o) => o.date === todayKey && o.status === "APPROVED"));
+      .then((list: { date: string; status: string; expectedEndTime: string }[]) => {
+        const approved = list.find((o) => o.date === todayKey && o.status === "APPROVED");
+        setOvertimeExpectedEndTime(approved?.expectedEndTime ?? null);
+      });
+    const leaveReq = fetch("/api/leave-requests")
+      .then((r) => r.json())
+      .then((list: { startDate: string; startTime: string | null; status: string }[]) => {
+        const hourly = Array.isArray(list) ? list.find((l) => l.startDate === todayKey && l.startTime && l.status === "APPROVED") : null;
+        setHourlyLeaveStartTime(hourly?.startTime ?? null);
       });
 
-    Promise.all([attendanceReq, overtimeReq]).finally(() => setLoading(false));
+    Promise.all([attendanceReq, overtimeReq, leaveReq]).finally(() => setLoading(false));
   }
 
   useEffect(loadToday, []);
@@ -68,6 +87,7 @@ export default function AttendanceCard() {
         return;
       }
       setToday({ checkInAt: data.checkInAt, checkOutAt: data.checkOutAt, autoCheckedOut: !!data.autoCheckedOut });
+      onChanged?.();
     } finally {
       setBusy(false);
     }
@@ -77,15 +97,28 @@ export default function AttendanceCard() {
 
   const checkedIn = !!today?.checkInAt;
   const checkedOut = !!today?.checkOutAt;
-  // Design Ref: §4.6 — 18:00 이전 퇴근 불가, 19:00 이후는 당일 승인된 초과근무가 있어야 가능
-  const canCheckOut = checkedIn && nowMinutes >= 18 * 60 && (nowMinutes < 19 * 60 || overtimeApprovedToday);
+
+  // Design Ref: §4.6 — 기본 18:00 이후 퇴근 가능. 당일 승인된 연차(시간)가 있으면 그 시작시간부터(조기 퇴근),
+  // 19:00 이후는 당일 승인된 초과근무가 있어야 하고 그 예상 퇴근시간을 넘기면 다시 차단(초과근무 시간 내에서만).
+  const hourlyLeaveStartMinutes = hourlyLeaveStartTime ? hhmmToMinutes(hourlyLeaveStartTime) : null;
+  const earliestMinutes = hourlyLeaveStartMinutes !== null ? Math.min(18 * 60, hourlyLeaveStartMinutes) : 18 * 60;
+  const overtimeEndMinutes = overtimeExpectedEndTime ? hhmmToMinutes(overtimeExpectedEndTime) : null;
+  const pastEarliest = nowMinutes >= earliestMinutes;
+  const withinFreeWindow = nowMinutes < 19 * 60;
+  const withinOvertimeWindow = overtimeEndMinutes !== null && nowMinutes <= overtimeEndMinutes;
+
+  const canCheckOut = checkedIn && pastEarliest && (withinFreeWindow || withinOvertimeWindow);
   const checkoutNote = !checkedIn
     ? "출근 먼저"
-    : nowMinutes < 18 * 60
-      ? "18:00 이후 가능"
-      : nowMinutes >= 19 * 60 && !overtimeApprovedToday
-        ? "19:00 이후는 초과근무 승인 필요"
-        : "";
+    : !pastEarliest
+      ? `${minutesToHHMM(earliestMinutes)} 이후 가능`
+      : withinFreeWindow
+        ? ""
+        : overtimeEndMinutes === null
+          ? "19:00 이후는 초과근무 승인 필요"
+          : nowMinutes > overtimeEndMinutes
+            ? `승인된 초과근무(${overtimeExpectedEndTime}까지) 시간이 지났습니다`
+            : "";
 
   return (
     <div className="card card-pad">

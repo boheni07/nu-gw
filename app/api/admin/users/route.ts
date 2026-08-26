@@ -22,22 +22,22 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json().catch(() => null);
   const name = typeof body?.name === "string" ? body.name.trim() : "";
-  const email = typeof body?.email === "string" ? body.email.trim() : "";
+  const username = typeof body?.username === "string" ? body.username.trim() : "";
   const departmentId = typeof body?.departmentId === "string" ? body.departmentId : "";
   const position = typeof body?.position === "string" ? body.position : "";
   const hireDate = typeof body?.hireDate === "string" ? body.hireDate : "";
   const role: UserRole = VALID_ROLES.includes(body?.role) ? body.role : "MEMBER";
   const tempPassword = typeof body?.tempPassword === "string" && body.tempPassword.length >= 8 ? body.tempPassword : null;
 
-  if (!name || !email || !departmentId || !hireDate || !tempPassword) {
+  if (!name || !username || !departmentId || !hireDate || !tempPassword) {
     return NextResponse.json(
-      { error: "이름·이메일·부서·입사일과 8자 이상의 임시 비밀번호가 필요합니다." },
+      { error: "이름·아이디·부서·입사일과 8자 이상의 임시 비밀번호가 필요합니다." },
       { status: 400 }
     );
   }
 
   const created = await createUser(
-    { name, email, departmentId, position, hireDate, role, employmentStatus: "ACTIVE", resignedAt: null },
+    { name, username, departmentId, position, hireDate, role, employmentStatus: "ACTIVE", resignedAt: null },
     hashPassword(tempPassword)
   );
   return NextResponse.json(created, { status: 201 });

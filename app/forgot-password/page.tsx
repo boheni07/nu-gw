@@ -8,7 +8,7 @@ import DateInput from "@/lib/ui/DateInput";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [hireDate, setHireDate] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, hireDate, newPassword }),
+        body: JSON.stringify({ username, hireDate, newPassword }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -68,13 +68,13 @@ export default function ForgotPasswordPage() {
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="field">
-              <label htmlFor="fp-email">이메일(로그인 ID)</label>
+              <label htmlFor="fp-username">아이디</label>
               <input
-                id="fp-email"
+                id="fp-username"
                 className="input"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
                 autoFocus
                 required

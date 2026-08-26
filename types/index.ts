@@ -29,6 +29,11 @@ export interface CompanySettings {
   hourlyLeaveMaxHours: number;
   /** module-11(Phase 3) Slack Incoming Webhook URL. null이면 Slack 전송을 시도하지 않는다 */
   slackWebhookUrl: string | null;
+  /**
+   * module-22 §출퇴근 체크 사내망 제한 — 출근/퇴근 체크를 허용할 IP 대역(쉼표 구분, CIDR 또는 단일 IP).
+   * 예: "192.168.0.0/16,10.0.0.0/8". 빈 문자열이면 제한 없이 어디서든 체크 가능.
+   */
+  allowedCheckInIpRanges: string;
 }
 
 /**
@@ -65,8 +70,8 @@ export interface Department {
 export interface User {
   id: string;
   name: string;
-  /** 로그인 ID (unique) */
-  email: string;
+  /** 로그인 아이디(unique). 이메일 형식을 요구하지 않는 일반 아이디다. */
+  username: string;
   departmentId: string;
   position: string;
   hireDate: string; // YYYY-MM-DD
@@ -80,7 +85,7 @@ export interface User {
 export interface SessionUser {
   id: string;
   name: string;
-  email: string;
+  username: string;
   role: UserRole;
   departmentId: string;
 }
@@ -251,6 +256,8 @@ export interface Event {
   createdBy: string;
   /** 부서 필터용 태그. null이면 전사 공통 일정 */
   departmentTag: string | null;
+  /** module-24 반복일정 — 같은 반복 등록으로 생성된 occurrence들이 공유하는 id. 단일 일정이면 null. */
+  recurrenceGroupId: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -480,4 +487,23 @@ export interface Holiday {
   date: string; // YYYY-MM-DD, 전사 유일
   name: string;
   source: HolidaySource;
+}
+
+/** module-23 사내게시판 — 누구나 작성 가능. isNotice=true인 글은 목록 상단에 항상 고정 노출된다. */
+export interface BoardPost {
+  id: string;
+  title: string;
+  content: string;
+  isNotice: boolean;
+  authorId: string;
+  createdAt: string; // ISO datetime
+  editedAt: string | null;
+}
+
+export interface BoardAttachment {
+  id: string;
+  postId: string;
+  fileName: string;
+  fileUrl: string;
+  uploadedAt: string;
 }

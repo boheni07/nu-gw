@@ -19,6 +19,8 @@ import type {
   DelegateAssignment,
   Department,
   DocumentType,
+  BoardAttachment,
+  BoardPost,
   Event,
   Holiday,
   HrRecord,
@@ -195,11 +197,11 @@ export async function getUserById(id: string): Promise<User | undefined> {
   return u ? stripPassword(u as StoredUser) : undefined;
 }
 
-export async function getUserByEmail(email: string): Promise<StoredUser | undefined> {
+export async function getUserByUsername(username: string): Promise<StoredUser | undefined> {
   await ensureSeeded();
-  // 이메일 대소문자 무관 비교(원본 로직 유지) — Postgres citext 도입 없이 lower() 비교로 재현한다.
+  // 아이디 대소문자 무관 비교(원본 로직 유지) — Postgres citext 도입 없이 lower() 비교로 재현한다.
   const rows = await prisma.user.findMany();
-  return (rows as StoredUser[]).find((u) => u.email.toLowerCase() === email.toLowerCase());
+  return (rows as StoredUser[]).find((u) => u.username.toLowerCase() === username.toLowerCase());
 }
 
 export async function createUser(input: Omit<User, "id">, passwordHash: string): Promise<User> {
@@ -714,6 +716,16 @@ export async function createEvent(input: Omit<Event, "id">): Promise<Event> {
   return prisma.event.create({ data: { id: `ev-${cryptoRandomId()}`, ...input } });
 }
 
+/** module-24 반복일정 — 한 번의 등록으로 여러 occurrence를 한꺼번에 생성한다. */
+export async function createEvents(inputs: Omit<Event, "id">[]): Promise<Event[]> {
+  await ensureSeeded();
+  const created: Event[] = [];
+  for (const input of inputs) {
+    created.push(await prisma.event.create({ data: { id: `ev-${cryptoRandomId()}`, ...input } }));
+  }
+  return created;
+}
+
 export async function updateEvent(id: string, patch: Partial<Omit<Event, "id" | "createdBy">>): Promise<Event | undefined> {
   await ensureSeeded();
   try {
@@ -727,6 +739,13 @@ export async function deleteEvent(id: string): Promise<boolean> {
   await ensureSeeded();
   const { count } = await prisma.event.deleteMany({ where: { id } });
   return count > 0;
+}
+
+/** module-24 반복일정 — 같은 반복 등록에서 생성된 occurrence 전체를 삭제한다(반복일정 전체 삭제). */
+export async function deleteEventsByRecurrenceGroup(recurrenceGroupId: string): Promise<number> {
+  await ensureSeeded();
+  const { count } = await prisma.event.deleteMany({ where: { recurrenceGroupId } });
+  return count;
 }
 
 /* ---------- AttendanceRecord (Design Ref: §3.7, §4.6) ---------- */
@@ -780,6 +799,12 @@ export async function hasApprovedOvertimeToday(userId: string, date: string): Pr
   await ensureSeeded();
   const row = await prisma.overtimeRequest.findFirst({ where: { userId, date, status: "APPROVED" } });
   return !!row;
+}
+
+/** §4.6 퇴근 체크 — 해당 날짜의 승인된 초과근무 신청(있으면 예상 퇴근시간으로 퇴근 가능 상한을 제한). */
+export async function getApprovedOvertimeForDate(userId: string, date: string): Promise<OvertimeRequest | undefined> {
+  await ensureSeeded();
+  return undef(await prisma.overtimeRequest.findFirst({ where: { userId, date, status: "APPROVED" } })) as OvertimeRequest | undefined;
 }
 
 export async function createOvertimeRequest(
@@ -1121,4 +1146,63 @@ export async function importAutoHolidays(items: { date: string; name: string }[]
     count++;
   }
   return count;
+}
+
+/* ---------- BoardPost / BoardAttachment (Design Ref: module-23 사내게시판) ---------- */
+
+/** 공지(isNotice) 먼저, 그 안에서는 최신순. 일반 글도 최신순으로 정렬해 반환한다. */
+export async function listBoardPosts(): Promise<BoardPost[]> {
+  await ensureSeeded();
+  const rows = await prisma.boardPost.findMany({ orderBy: [{ isNotice: "desc" }, { createdAt: "desc" }] });
+  return rows as BoardPost[];
+}
+
+export async function getBoardPost(id: string): Promise<BoardPost | undefined> {
+  await ensureSeeded();
+  return undef(await prisma.boardPost.findUnique({ where: { id } })) as BoardPost | undefined;
+}
+
+export async function createBoardPost(input: Omit<BoardPost, "id" | "createdAt" | "editedAt">): Promise<BoardPost> {
+  await ensureSeeded();
+  return (await prisma.boardPost.create({
+    data: { id: `board-${cryptoRandomId()}`, ...input, createdAt: new Date().toISOString(), editedAt: null },
+  })) as BoardPost;
+}
+
+export async function updateBoardPost(
+  id: string,
+  patch: Partial<Pick<BoardPost, "title" | "content" | "isNotice">>
+): Promise<BoardPost | undefined> {
+  await ensureSeeded();
+  try {
+    const updated = await prisma.boardPost.update({ where: { id }, data: { ...patch, editedAt: new Date().toISOString() } });
+    return updated as BoardPost;
+  } catch {
+    return undefined;
+  }
+}
+
+/** 게시글과 첨부파일 레코드를 함께 삭제한다(업로드된 실물 파일은 다른 첨부파일 기능과 동일하게 남겨둔다). */
+export async function deleteBoardPost(id: string): Promise<boolean> {
+  await ensureSeeded();
+  try {
+    await prisma.boardAttachment.deleteMany({ where: { postId: id } });
+    await prisma.boardPost.delete({ where: { id } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function listBoardAttachments(postId: string): Promise<BoardAttachment[]> {
+  await ensureSeeded();
+  const rows = await prisma.boardAttachment.findMany({ where: { postId } });
+  return rows as BoardAttachment[];
+}
+
+export async function createBoardAttachment(input: Omit<BoardAttachment, "id" | "uploadedAt">): Promise<BoardAttachment> {
+  await ensureSeeded();
+  return (await prisma.boardAttachment.create({
+    data: { id: `bfile-${cryptoRandomId()}`, ...input, uploadedAt: new Date().toISOString() },
+  })) as BoardAttachment;
 }

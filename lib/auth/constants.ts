@@ -4,6 +4,6 @@ export const SESSION_COOKIE = "nugw_session";
 
 /**
  * module-17 총괄관리자 — DB를 초기화해도 항상 시드로 복원되는 최상위 관리자 계정(lib/data/seed.json).
- * 다른 관리자가 실수로 삭제·강등·퇴사 처리하지 못하도록 이 이메일을 특별 보호 대상으로 취급한다.
+ * 다른 관리자가 실수로 삭제·강등·퇴사 처리하지 못하도록 이 아이디를 특별 보호 대상으로 취급한다.
  */
-export const MASTER_ADMIN_EMAIL = "master@nubiz.kr";
+export const MASTER_ADMIN_USERNAME = "master";

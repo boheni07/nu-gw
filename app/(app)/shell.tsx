@@ -9,6 +9,7 @@ import NotificationBell from "./notification-bell";
 import {
   ApprovalLineIcon,
   ApprovalsIcon,
+  BoardIcon,
   CalendarIcon,
   ChevronIcon,
   ClockIcon,
@@ -38,6 +39,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/dashboard", label: "대시보드", icon: <DashboardIcon /> },
       { href: "/calendar", label: "캘린더", icon: <CalendarIcon /> },
+      { href: "/board", label: "사내게시판", icon: <BoardIcon /> },
     ],
   },
   {
@@ -85,6 +87,7 @@ const TITLES: Record<string, [string, string]> = {
   "/business-trip": ["출장 신청", "관내·시외출장을 신청하세요"],
   "/trip-report": ["출장결과보고", "시외출장 완료 후 3일 이내 결과보고와 출장비를 청구하세요"],
   "/calendar": ["캘린더", "승인된 휴가와 사내 일정을 한눈에 확인하세요"],
+  "/board": ["사내게시판", "공지사항과 자유롭게 공유할 소식을 올려보세요"],
   "/attendance": ["출퇴근 관리", "월별 근태 현황을 조회하세요"],
   "/daily-reports": ["일일업무보고", "오늘의 업무를 기록하고 내일 계획을 세워보세요"],
   "/weekly-reports": ["주간업무보고", "전일 계획 · 금주 실적을 자동으로 정리해드려요"],

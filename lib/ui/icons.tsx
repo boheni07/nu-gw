@@ -273,3 +273,24 @@ export function KeyIcon({ size = 15 }: IconProps) {
     </svg>
   );
 }
+
+/** module-23 사내게시판 — 사이드바 메뉴 아이콘 */
+export function BoardIcon({ size = 18 }: IconProps) {
+  return (
+    <svg width={size} height={size} {...base}>
+      <rect x="3.5" y="3" width="13" height="14" rx="1.4" />
+      <line x1="6.2" y1="7.2" x2="13.8" y2="7.2" strokeLinecap="round" />
+      <line x1="6.2" y1="10.3" x2="13.8" y2="10.3" strokeLinecap="round" />
+      <line x1="6.2" y1="13.4" x2="11" y2="13.4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** 사내게시판 §첨부파일 표시 */
+export function AttachmentIcon({ size = 14 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6}>
+      <path d="M13.5 6.2l-6 6a2.5 2.5 0 003.5 3.5l6-6a4.2 4.2 0 00-6-6l-6 6a5.9 5.9 0 008.3 8.3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}

@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { isAdmin } from "@/lib/auth/rbac";
-import { deleteEvent, getEvent, updateEvent } from "@/lib/data/store";
+import { deleteEvent, deleteEventsByRecurrenceGroup, getEvent, updateEvent } from "@/lib/data/store";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
@@ -23,7 +23,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   return NextResponse.json(updated);
 }
 
-export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+/** module-24 반복일정 — ?scope=series면 같은 recurrenceGroupId를 가진 occurrence 전체를 삭제한다. */
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
 
@@ -34,6 +35,12 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
     return NextResponse.json({ error: "본인이 등록한 일정만 삭제할 수 있습니다." }, { status: 403 });
   }
 
+  const scope = new URL(request.url).searchParams.get("scope");
+  if (scope === "series" && existing.recurrenceGroupId) {
+    const count = await deleteEventsByRecurrenceGroup(existing.recurrenceGroupId);
+    return NextResponse.json({ ok: true, deletedCount: count });
+  }
+
   await deleteEvent(id);
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, deletedCount: 1 });
 }

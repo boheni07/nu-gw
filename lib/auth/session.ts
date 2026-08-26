@@ -43,7 +43,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   return {
     id: user.id,
     name: user.name,
-    email: user.email,
+    username: user.username,
     role: user.role,
     departmentId: user.departmentId,
   };

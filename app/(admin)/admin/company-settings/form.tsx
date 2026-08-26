@@ -123,6 +123,22 @@ export default function CompanySettingsForm({ initial }: { initial: CompanySetti
       </p>
 
       <hr className="divider" />
+      <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-muted)" }}>출퇴근 체크 설정</div>
+
+      <div className="field">
+        <label>출퇴근 체크 허용 IP 대역</label>
+        <input
+          className="input"
+          value={form.allowedCheckInIpRanges}
+          onChange={(e) => set("allowedCheckInIpRanges", e.target.value)}
+          placeholder="예: 192.168.0.0/16,10.0.0.0/8"
+        />
+        <p className="helptext">
+          쉼표(,)로 구분된 CIDR 또는 단일 IP 목록입니다. 이 대역 밖에서는 출근/퇴근 체크가 차단됩니다. 비워두면 제한 없이 어디서든 체크할 수 있습니다.
+        </p>
+      </div>
+
+      <hr className="divider" />
       <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-muted)" }}>알림 연동 설정</div>
 
       <div className="field">

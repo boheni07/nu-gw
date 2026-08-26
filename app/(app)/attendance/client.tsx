@@ -4,6 +4,8 @@
 // — 조회 카드 + 통계 stat 카드 + 일자별(날짜/요일 분리) 테이블 구조(module-12 디자인 정합화).
 // 관리자를 포함해 누구나 본인 근태만 조회한다(타 직원 조회 기능 제거 — 사용자 요청).
 import { useEffect, useState } from "react";
+// module-22 §출퇴근 체크 상단 노출 — 대시보드와 동일한 출근/퇴근 체크 카드를 이 화면 상단에서도 그대로 재사용한다.
+import AttendanceCard from "../dashboard/attendance-card";
 
 interface Day {
   date: string;
@@ -39,18 +41,21 @@ export default function AttendanceClient() {
   const [detail, setDetail] = useState<MonthlyDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  function loadDetail() {
     setLoading(true);
     fetch(`/api/attendance?month=${month}`)
       .then((r) => r.json())
       .then((data) => setDetail(data))
       .finally(() => setLoading(false));
-  }, [month]);
+  }
+
+  useEffect(loadDetail, [month]);
 
   const todayKey = new Date().toISOString().slice(0, 10);
 
   return (
     <div className="stack">
+      <AttendanceCard onChanged={loadDetail} />
       <div className="card card-pad" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <label htmlFor="att-month" style={{ margin: 0 }}>

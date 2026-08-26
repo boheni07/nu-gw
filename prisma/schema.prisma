@@ -23,6 +23,8 @@ model CompanySettings {
   hourlyLeaveUnitHours   Int
   hourlyLeaveMaxHours    Int
   slackWebhookUrl        String?
+  /// 출퇴근 체크 허용 IP 대역(쉼표 구분 CIDR/IP). 빈 문자열이면 제한 없음. 기본값은 사설(RFC1918) 대역 전체.
+  allowedCheckInIpRanges String @default("10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1/32")
 }
 
 /// 출장비 단가(기준연도별). 계산에는 항상 year가 가장 큰(최근) 행을 사용한다.
@@ -43,7 +45,7 @@ model Department {
 model User {
   id              String    @id
   name            String
-  email           String    @unique
+  username        String    @unique
   passwordHash    String
   departmentId    String
   position        String
@@ -161,14 +163,16 @@ model Attachment {
 }
 
 model Event {
-  id             String  @id
-  title          String
-  startAt        String
-  endAt          String
-  location       String?
-  description    String?
-  createdBy      String
-  departmentTag  String?
+  id                String  @id
+  title             String
+  startAt           String
+  endAt             String
+  location          String?
+  description       String?
+  createdBy         String
+  departmentTag     String?
+  /// module-24 반복일정 — 같은 반복 등록에서 생성된 occurrence들이 공유하는 id. 단일 일정이면 null.
+  recurrenceGroupId String?
 }
 
 model AttendanceRecord {
@@ -286,6 +290,26 @@ model Holiday {
   date   String @unique
   name   String
   source String
+}
+
+/// module-23 사내게시판 — 누구나 작성 가능. isNotice=true면 목록 상단에 고정되고 공지 뱃지가 표시된다.
+model BoardPost {
+  id        String  @id
+  title     String
+  content   String
+  isNotice  Boolean
+  authorId  String
+  createdAt String
+  editedAt  String?
+}
+
+/// 사내게시판 첨부파일. postId는 BoardPost.id를 가리키지만(다른 Attachment 모델과 동일하게) 느슨한 참조로 둔다.
+model BoardAttachment {
+  id         String @id
+  postId     String
+  fileName   String
+  fileUrl    String
+  uploadedAt String
 }
 
 model HrRecord {

@@ -132,6 +132,7 @@ export default async function ApprovalsPage() {
       summary: detail.summary,
       dateLabel: a.submittedAt,
       status: "PENDING",
+      awaitingMyAction: true,
       isDelegated,
       comment: null,
       fields: detail.fields,
@@ -149,6 +150,11 @@ export default async function ApprovalsPage() {
       if (!approval) return null;
       const submitter = await getUserById(approval.submitterId);
       const detail = await buildDetail(approval.targetType, approval.targetId, leaveTypes);
+      // 병렬 승인 단계에서는 "내가 승인 버튼을 눌렀다"와 "결재 건 전체가 승인 완료됐다"가 다를 수 있다
+      // (다른 병렬 승인자가 아직 처리하지 않았으면 전체 상태는 여전히 PENDING). 로그의 내 행위가 아니라
+      // 결재 건의 실제 현재 상태(approval.status)를 그대로 보여줘야 "승인됐는데 캘린더/목록엔 안 보인다" 같은
+      // 혼선이 생기지 않는다.
+      const totalSteps = Math.max(...approval.steps.map((s) => s.stepOrder));
       const row: ApprovalRow = {
         approvalId: approval.id,
         targetType: approval.targetType,
@@ -156,11 +162,15 @@ export default async function ApprovalsPage() {
         departmentName: submitter ? deptName(submitter.departmentId) : "-",
         summary: detail.summary,
         dateLabel: log.processedAt,
-        status: log.action === "REJECT" ? "REJECTED" : "APPROVED",
+        status: approval.status,
+        awaitingMyAction: false,
         isDelegated: log.representedUserId !== log.approverUserId,
         comment: log.comment,
         fields: detail.fields,
-        stepInfo: null,
+        stepInfo:
+          log.action === "APPROVE" && approval.status === "PENDING"
+            ? `내 처리 완료 · 다른 승인자 대기중(${approval.currentStep}/${totalSteps}단계)`
+            : null,
       };
       return row;
     })

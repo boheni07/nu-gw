@@ -17,7 +17,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
   const existing = await getHrRecord(userId);
   if (existing) return NextResponse.json(existing);
-  return NextResponse.json(emptyHrRecord(userId, target.name, target.email));
+  // 로그인 아이디(username)는 더 이상 이메일 형식을 보장하지 않아 기본값으로 쓰지 않는다.
+  return NextResponse.json(emptyHrRecord(userId, target.name, ""));
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
@@ -33,7 +34,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   if (!body) return NextResponse.json({ error: "잘못된 요청입니다." }, { status: 400 });
 
   const existing = await getHrRecord(userId);
-  const patch = sanitizeHrRecordPatch(body, target.name, target.email, existing?.agreed ?? false);
+  const patch = sanitizeHrRecordPatch(body, target.name, existing?.email ?? "", existing?.agreed ?? false);
   const saved = await saveHrRecord(userId, patch);
 
   return NextResponse.json(saved);

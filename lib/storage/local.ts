@@ -8,17 +8,39 @@ const UPLOADS_ROOT = path.join(process.cwd(), "uploads");
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED_EXTENSIONS = [".pdf", ".png", ".jpg", ".jpeg"];
 
+/** 사내게시판(module-23)은 증빙파일보다 폭넓은 첨부(문서/압축파일 등)를 허용한다. */
+export const BOARD_ALLOWED_EXTENSIONS = [
+  ".pdf",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".doc",
+  ".docx",
+  ".xls",
+  ".xlsx",
+  ".ppt",
+  ".pptx",
+  ".txt",
+  ".hwp",
+  ".zip",
+];
+
 export class StorageError extends Error {}
 
 function sanitizeFileName(name: string): string {
   return name.replace(/[^\w.\-가-힣 ]/g, "_").slice(0, 120);
 }
 
-/** multipart 폼에서 받은 File을 uploads/leave/{leaveRequestId 대용 prefix}/ 아래에 저장한다. */
-export async function saveUploadedFile(file: File, subDir: string): Promise<{ fileName: string; storedPath: string }> {
+/** multipart 폼에서 받은 File을 uploads/{subDir}/ 아래에 저장한다. allowedExtensions로 확장자 제한을 바꿀 수 있다. */
+export async function saveUploadedFile(
+  file: File,
+  subDir: string,
+  allowedExtensions: string[] = ALLOWED_EXTENSIONS
+): Promise<{ fileName: string; storedPath: string }> {
   const ext = path.extname(file.name).toLowerCase();
-  if (!ALLOWED_EXTENSIONS.includes(ext)) {
-    throw new StorageError("PDF, PNG, JPG 파일만 업로드할 수 있습니다.");
+  if (!allowedExtensions.includes(ext)) {
+    throw new StorageError(`허용되지 않는 파일 형식입니다(${allowedExtensions.join(", ")}만 업로드할 수 있습니다).`);
   }
   if (file.size > MAX_FILE_BYTES) {
     throw new StorageError("파일 크기는 10MB를 초과할 수 없습니다.");
