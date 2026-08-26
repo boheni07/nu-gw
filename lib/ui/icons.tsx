@@ -251,3 +251,25 @@ export function DelegateIcon({ size = 18 }: IconProps) {
     </svg>
   );
 }
+
+/** 사용자 관리 §수정 — 목록 액션 버튼을 텍스트에서 아이콘으로 바꿀 때 사용(module-22, 가로 스크롤 축소 목적) */
+export function EditIcon({ size = 15 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6}>
+      <path d="M12.6 4.4l3 3-8.1 8.1-3.6.6.6-3.6z" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M11.2 5.8l3 3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** 사용자 관리 §비밀번호 초기화 */
+export function KeyIcon({ size = 15 }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.6}>
+      <circle cx="7" cy="13" r="3" />
+      <path d="M9.2 10.8L15.5 4.5" strokeLinecap="round" />
+      <path d="M13 7l1.8 1.8" strokeLinecap="round" />
+      <path d="M15.2 4.8l1.8 1.8" strokeLinecap="round" />
+    </svg>
+  );
+}

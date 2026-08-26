@@ -145,10 +145,14 @@ label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-m
 .pill.danger { background: var(--danger-soft); color: var(--danger); }
 .pill.neutral { background: var(--surface-alt); color: var(--text-muted); }
 
+/* 표 컬럼은 기본적으로 줄바꿈하지 않는다(auto table-layout이 내용 폭에 맞춰 컬럼 크기를 정리해준다).
+   행 높이가 셀마다 들쭉날쭉해지는 것을 막고, 넘치는 폭은 .table-wrap의 가로 스크롤로 흡수한다.
+   결재선 요약처럼 길어질 수 있는 텍스트는 개별 셀에서 max-width + text-overflow: ellipsis로 잘라 표시한다. */
 table { width: 100%; border-collapse: collapse; }
-th { text-align: left; font-size: 11.5px; color: var(--text-faint); font-weight: 600; padding: 0 12px 8px; border-bottom: 1px solid var(--border); }
-td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+th { text-align: left; font-size: 11.5px; color: var(--text-faint); font-weight: 600; padding: 0 12px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; white-space: nowrap; }
 tr:last-child td { border-bottom: none; }
+td.wrap { white-space: normal; }
 
 /* ---------- Calendar (module-4) ---------- */
 .cal-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
@@ -237,7 +241,9 @@ button.user-chip:hover { background: var(--surface-alt); }
 }
 .logout-btn:hover { background: var(--danger-soft); color: var(--danger); }
 
-.main { display: flex; flex-direction: column; min-width: 0; }
+/* 사이드바를 제외한 화면 영역(상단바+본문)은 1280px를 최대 폭으로 하고, 그보다 넓은 모니터에서는
+   가운데 정렬한다. 1280px 이하에서는 기존처럼 남은 공간을 그대로 채우는 유동 폭(반응형)으로 동작한다. */
+.main { display: flex; flex-direction: column; min-width: 0; max-width: 1280px; width: 100%; margin: 0 auto; }
 .topbar {
   height: 60px; flex: none; border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between;
@@ -428,6 +434,26 @@ button.user-chip:hover { background: var(--surface-alt); }
   .grid-2 { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .row { flex-direction: column; }
+
+  /* 목록(표)을 좁은 화면에서 가로 스크롤 대신 항목별 카드로 접어 보여준다. 각 셀은 칩처럼 흘러가며
+     필요하면 두 줄 정도로 감싸져 화면 폭 안에 전부 들어오게 한다(가로 스크롤 없이 한 화면에 보이도록). */
+  .table-wrap { overflow-x: visible; }
+  .table-wrap table, .table-wrap tbody { display: block; width: 100%; }
+  .table-wrap thead { display: none; }
+  .table-wrap tr {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px;
+    border: 1px solid var(--border); border-radius: var(--r-sm);
+    padding: 10px 12px; margin-bottom: 8px;
+  }
+  .table-wrap tbody tr:last-child { margin-bottom: 0; }
+  .table-wrap td {
+    display: inline-flex; align-items: center; border-bottom: none; padding: 0;
+    /* 데스크톱에서 인라인 style로 강제한 nowrap/ellipsis(긴 텍스트 컬럼)를 좁은 화면에서는 풀어준다 */
+    white-space: normal !important; overflow: visible !important; text-overflow: clip !important; max-width: none !important;
+  }
+  /* 보통 마지막 컬럼이 액션 버튼/상태 배지라 오른쪽 정렬해두면 카드 안에서 자연스럽게 정리된다 */
+  .table-wrap td:last-child { margin-left: auto; }
+  .table-wrap td.empty { display: block; width: 100%; }
 }
 @media (min-width: 881px) {
   .hamburger { display: none; }

@@ -4,7 +4,7 @@
 // 우측 슬라이드 패널(정보수정/등록) 구조로 정리(module-12 디자인 정합화)
 import { useMemo, useState } from "react";
 import type { Department, User, UserRole } from "@/types";
-import { CloseIcon, PlusIcon } from "@/lib/ui/icons";
+import { CloseIcon, EditIcon, KeyIcon, LogoutIcon, PlusIcon, TrashIcon } from "@/lib/ui/icons";
 import DateInput from "@/lib/ui/DateInput";
 
 const ROLE_LABEL: Record<UserRole, string> = { ADMIN: "관리자", APPROVER: "결재자", MEMBER: "일반 사용자" };
@@ -188,9 +188,7 @@ export default function UsersClient({
           <thead>
             <tr>
               <th>이름</th>
-              <th>이메일</th>
-              <th>부서</th>
-              <th>직급</th>
+              <th>부서/직급</th>
               <th>입사일</th>
               <th>역할</th>
               <th>상태</th>
@@ -200,17 +198,21 @@ export default function UsersClient({
           <tbody>
             {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={8} className="empty">
+                <td colSpan={6} className="empty">
                   해당하는 사용자가 없습니다.
                 </td>
               </tr>
             ) : (
               filteredUsers.map((u) => (
                 <tr key={u.id}>
-                  <td>{u.name}</td>
-                  <td style={{ color: "var(--text-faint)" }}>{u.email}</td>
-                  <td>{deptName(u.departmentId)}</td>
-                  <td>{u.position || "—"}</td>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{u.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-faint)" }}>{u.email}</div>
+                  </td>
+                  <td>
+                    {deptName(u.departmentId)}
+                    {u.position && <span style={{ color: "var(--text-faint)" }}> · {u.position}</span>}
+                  </td>
                   <td className="num">{u.hireDate}</td>
                   <td>
                     <span className={`pill ${ROLE_PILL_CLASS[u.role]}`}>{ROLE_LABEL[u.role]}</span>
@@ -223,43 +225,56 @@ export default function UsersClient({
                     )}
                   </td>
                   <td style={{ textAlign: "right" }}>
-                    <div style={{ display: "flex", gap: 6, justifyContent: "flex-end" }}>
+                    <div style={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
                       {u.employmentStatus !== "RESIGNED" && (
                         <>
                           <button
                             type="button"
-                            className="btn ghost"
+                            className="icon-btn"
+                            title="수정"
+                            aria-label="수정"
                             onClick={() => {
                               setEditHireDate(u.hireDate);
                               setEditing(u);
                             }}
                           >
-                            수정
+                            <EditIcon />
                           </button>
                           <button
                             type="button"
-                            className="btn ghost"
+                            className="icon-btn"
+                            title="비밀번호 초기화"
+                            aria-label="비밀번호 초기화"
                             onClick={() => {
                               setPwError(null);
                               setResettingPw(u);
                             }}
                           >
-                            비밀번호 초기화
+                            <KeyIcon />
                           </button>
                           <button
                             type="button"
-                            className="btn ghost"
+                            className="icon-btn"
+                            title="퇴사 처리"
+                            aria-label="퇴사 처리"
                             onClick={() => {
                               setResignedAtDate(todayStr());
                               setResigning(u);
                             }}
                           >
-                            퇴사 처리
+                            <LogoutIcon size={15} />
                           </button>
                         </>
                       )}
-                      <button type="button" className="btn ghost" style={{ color: "var(--danger)" }} onClick={() => handleDelete(u)}>
-                        삭제
+                      <button
+                        type="button"
+                        className="icon-btn"
+                        style={{ color: "var(--danger)" }}
+                        title="삭제"
+                        aria-label="삭제"
+                        onClick={() => handleDelete(u)}
+                      >
+                        <TrashIcon />
                       </button>
                     </div>
                   </td>

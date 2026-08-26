@@ -310,7 +310,9 @@ export default function ApprovalLinesClient({
                         >
                           <td>{deptNameOf(dept.id)}</td>
                           <td>{DOC_TYPE_LABEL[dt]}</td>
-                          <td>{line ? summaryFor(line) : <span className="hint">미설정</span>}</td>
+                          <td style={{ maxWidth: 280, overflow: "hidden", textOverflow: "ellipsis" }} title={line ? summaryFor(line) : undefined}>
+                            {line ? summaryFor(line) : <span className="hint">미설정</span>}
+                          </td>
                           <td>
                             <span className={`pill ${line ? "success" : "neutral"}`}>{line ? "설정됨" : "미설정"}</span>
                           </td>

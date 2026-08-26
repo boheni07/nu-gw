@@ -13,7 +13,12 @@ export async function issueSession(userId: string) {
   store.set(SESSION_COOKIE, session.id, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    // Secure 쿠키는 HTTPS(또는 localhost)에서만 브라우저가 저장한다. 이 앱은 프로덕션 빌드에서도
+    // Docker(docker-compose)로 평문 HTTP(3000 포트)만 서비스하므로 NODE_ENV 기준으로 켜면 다른 PC에서
+    // LAN IP(http://<ip>:3000)로 접속 시 로그인 API는 성공(200)해도 쿠키가 저장되지 않아 로그인이
+    // 안 되는 것처럼 보인다(같은 PC의 http://localhost는 브라우저가 예외로 봐서 증상이 안 보일 수 있음).
+    // 리버스 프록시 등으로 HTTPS를 앞단에 두게 되면 COOKIE_SECURE=true 환경변수로 다시 켠다.
+    secure: process.env.COOKIE_SECURE === "true",
     path: "/",
     expires: new Date(session.expiresAt),
   });

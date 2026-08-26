@@ -26,6 +26,9 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://nugw:nugw-pg-2026!@postgres:5432/nugw
+      # 이 앱은 평문 HTTP(3000 포트)만 서비스한다. 나중에 리버스 프록시 등으로 HTTPS를 앞단에 두게 되면
+      # COOKIE_SECURE=true로 바꿔 세션 쿠키에 Secure 속성을 다시 켠다(lib/auth/session.ts 참고).
+      COOKIE_SECURE: "false"
     depends_on:
       postgres:
         condition: service_healthy
